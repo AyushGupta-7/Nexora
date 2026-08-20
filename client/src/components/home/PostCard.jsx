@@ -30,7 +30,7 @@ const PostCard = ({ post, onPostUpdated }) => {
   const authorTitle = author.title || 'Member'
   const authorAvatar = author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}`
 
-  const isAuthor = user?._id === post.author?._id
+ const isAuthor = String(user?._id || user?.id) === String(post.author?._id || post.author?.id)
   const userAvatar = user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullName || 'User')}`
 
   const formatDate = (date) => {
