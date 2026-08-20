@@ -1,0 +1,78 @@
+.social-login {
+  margin-top: 16px;
+}
+
+.social-divider {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.divider-line {
+  flex: 1;
+  border-top: 1px solid var(--color-outline-variant);
+}
+
+.divider-text {
+  flex-shrink: 0;
+  margin: 0 16px;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+}
+
+.social-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+  background: var(--color-surface-variant);
+  border-color: var(--color-outline);
+}
+
+.social-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .social-buttons {
+    gap: 12px;
+  }
+  
+  .social-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  
+  .social-icon {
+    width: 16px;
+    height: 16px;
+  }
+}

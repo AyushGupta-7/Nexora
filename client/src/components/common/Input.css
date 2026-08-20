@@ -1,0 +1,110 @@
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.input-label {
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.input-icon .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--color-on-surface-variant);
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(253, 251, 255, 0.05);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 24px;
+  font-family: 'Inter', sans-serif;
+  color: var(--color-on-surface);
+  transition: all 0.3s ease;
+  outline: none;
+  position: relative;
+  z-index: 1;
+}
+
+.input-field.has-icon {
+  padding-left: 44px;
+}
+
+.input-field.has-password {
+  padding-right: 44px;
+}
+
+.input-field::placeholder {
+  color: rgba(185, 202, 202, 0.5);
+}
+
+.input-field:focus {
+  border-color: var(--color-primary-container);
+  box-shadow: 0 0 0 2px rgba(0, 247, 255, 0.2);
+}
+
+.input-field.has-error {
+  border-color: var(--color-error);
+}
+
+.input-field.has-error:focus {
+  box-shadow: 0 0 0 2px rgba(255, 180, 171, 0.2);
+}
+
+.input-toggle {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 4px;
+  z-index: 2;
+}
+
+.input-toggle:hover {
+  color: var(--color-on-surface);
+}
+
+.input-toggle .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.input-error {
+  font-size: 12px;
+  color: var(--color-error);
+  margin-top: 4px;
+}

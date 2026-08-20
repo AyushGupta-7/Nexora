@@ -1,0 +1,346 @@
+/* Add this to your PostCard.css or create a new file */
+
+/* Comment item styles */
+.comment-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.comment-item:not(:last-child) {
+  border-bottom: 1px solid rgba(58, 74, 74, 0.2);
+}
+
+.comment-avatar-small {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.comment-avatar-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.comment-content {
+  flex: 1;
+  position: relative;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.comment-author {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.comment-time {
+  font-size: 10px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  color: rgba(185, 202, 202, 0.5);
+}
+
+.comment-text {
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+  word-wrap: break-word;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.comment-like-btn,
+.comment-reply-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.comment-like-btn:hover,
+.comment-reply-btn:hover {
+  background: var(--color-surface-variant);
+  color: var(--color-secondary);
+}
+
+.comment-like-btn.liked {
+  color: var(--color-secondary);
+}
+
+.comment-like-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.comment-delete-btn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.comment-item:hover .comment-delete-btn {
+  opacity: 1;
+}
+
+.comment-delete-btn:hover {
+  color: var(--color-error);
+  background: rgba(255, 180, 171, 0.1);
+}
+
+.comment-delete-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+/* Replies Section */
+.replies-section {
+  margin-top: 8px;
+  margin-left: 20px;
+  padding-left: 12px;
+  border-left: 2px solid var(--color-outline-variant);
+}
+
+.show-replies-btn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.show-replies-btn:hover {
+  color: var(--color-secondary);
+  background: var(--color-surface-variant);
+}
+
+/* Reply item */
+.reply-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.reply-item:not(:last-child) {
+  border-bottom: 1px solid rgba(58, 74, 74, 0.2);
+}
+
+.reply-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.reply-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reply-content {
+  flex: 1;
+}
+
+.reply-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 1px;
+  flex-wrap: wrap;
+}
+
+.reply-author {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.reply-time {
+  font-size: 9px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  color: rgba(185, 202, 202, 0.5);
+}
+
+.reply-text {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  word-wrap: break-word;
+}
+
+.reply-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.reply-like-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  padding: 1px 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.reply-like-btn:hover {
+  background: var(--color-surface-variant);
+  color: var(--color-secondary);
+}
+
+.reply-like-btn.liked {
+  color: var(--color-secondary);
+}
+
+.reply-like-btn .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.reply-delete-btn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: 1px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.reply-item:hover .reply-delete-btn {
+  opacity: 1;
+}
+
+.reply-delete-btn:hover {
+  color: var(--color-error);
+}
+
+.reply-delete-btn .material-symbols-outlined {
+  font-size: 14px;
+}
+
+/* Reply Input */
+.reply-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 4px;
+  background: rgba(253, 251, 255, 0.03);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
+.reply-avatar-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.reply-avatar-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reply-input {
+  flex: 1;
+  min-width: 100px;
+  padding: 4px 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-on-surface);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+}
+
+.reply-input::placeholder {
+  color: rgba(185, 202, 202, 0.5);
+}
+
+.reply-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  background: var(--color-secondary);
+  border: none;
+  border-radius: 4px;
+  color: #002019;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reply-submit:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.reply-submit .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.reply-submit:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.reply-cancel {
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.reply-cancel:hover {
+  color: var(--color-error);
+}

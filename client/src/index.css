@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-on-primary: #003739;
+  --color-surface-variant: #27354c;
+  --color-primary: #efffff;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-secondary-container: #00c7a5;
+  --color-secondary-fixed: #5ffbd6;
+  --color-secondary-fixed-dim: #38debb;
+  --color-primary-fixed: #54f8ff;
+  --color-surface-tint: #00dce3;
+  --color-on-primary-fixed-variant: #004f52;
+  --color-surface: #041329;
+  --color-primary-container: #00f7ff;
+  --color-on-tertiary-container: #536284;
+  --color-surface-container-high: #1c2a41;
+  --color-surface-container-lowest: #010e24;
+  --color-on-tertiary-fixed-variant: #374767;
+  --color-tertiary: #fdfbff;
+  --color-surface-container-highest: #27354c;
+  --color-inverse-surface: #d6e3ff;
+  --color-surface-container: #112036;
+  --color-on-secondary-fixed: #002019;
+  --color-outline-variant: #3a4a4a;
+  --color-on-primary-fixed: #002021;
+  --color-surface-container-low: #0d1c32;
+  --color-error: #ffb4ab;
+  --color-on-secondary: #00382d;
+  --color-on-secondary-fixed-variant: #005142;
+  --color-on-error-container: #ffdad6;
+  --color-surface-bright: #2c3951;
+  --color-outline: #849494;
+  --color-on-surface: #d6e3ff;
+  --color-surface-dim: #041329;
+  --color-background: #041329;
+  --color-on-background: #d6e3ff;
+  --color-on-tertiary-fixed: #091b39;
+  --color-on-tertiary: #20304f;
+  --color-inverse-on-surface: #233148;
+  --color-on-secondary-container: #004d3f;
+  --color-secondary: #41e4c0;
+  --color-tertiary-container: #d3dfff;
+  --color-inverse-primary: #00696d;
+  --color-on-surface-variant: #b9caca;
+  --color-on-primary-container: #006d71;
+  --color-primary-fixed-dim: #00dce3;
+  --color-tertiary-fixed-dim: #b6c6ed;
+  --color-tertiary-fixed: #d8e2ff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
+}
