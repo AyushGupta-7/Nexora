@@ -9,6 +9,8 @@ dotenv.config()
 // Import routes
 const authRoutes = require('./routes/authRoutes')
 const postRoutes = require('./routes/postRoutes')
+const profileRoutes = require('./routes/profileRoutes')
+
 
 // Initialize express
 const app = express()
@@ -38,6 +40,8 @@ const connectDB = async () => {
 // Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/posts', postRoutes)
+app.use('/api/profile', profileRoutes)
+
 
 // Health check
 app.get('/api/health', (req, res) => {

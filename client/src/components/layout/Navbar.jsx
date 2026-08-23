@@ -24,6 +24,12 @@ const Navbar = () => {
     navigate('/login')
   }
 
+  // ✅ Navigate to profile page
+  const handleViewProfile = () => {
+    setDropdownOpen(false)
+    navigate('/profile')
+  }
+
   const userAvatar = user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullName || 'User')}`
 
   return (
@@ -78,7 +84,8 @@ const Navbar = () => {
 
             {dropdownOpen && (
               <div className="dropdown-menu">
-                <div className="dropdown-header">
+                {/* ✅ Clickable dropdown header - navigates to profile */}
+                <div className="dropdown-header clickable" onClick={handleViewProfile}>
                   <div className="dropdown-avatar">
                     <img src={userAvatar} alt={user?.fullName || 'User'} />
                   </div>
@@ -90,13 +97,22 @@ const Navbar = () => {
                     <span className="dropdown-user-title">{user?.title || 'Member'}</span>
                   </div>
                 </div>
+                
+                {/* ✅ View Profile button */}
                 <div className="dropdown-profile-btn">
-                  <button className="view-profile-btn">View Profile</button>
+                  <button className="view-profile-btn" onClick={handleViewProfile}>
+                    View Profile
+                  </button>
                 </div>
+                
                 <div className="dropdown-divider"></div>
-                <Link to="/settings" className="dropdown-item">Settings & Privacy</Link>
+                <Link to="/settings" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                  Settings & Privacy
+                </Link>
                 <div className="dropdown-divider"></div>
-                <button onClick={handleLogout} className="dropdown-item logout-item">Logout</button>
+                <button onClick={handleLogout} className="dropdown-item logout-item">
+                  Logout
+                </button>
               </div>
             )}
           </div>

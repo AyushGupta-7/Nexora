@@ -1,9 +1,12 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import './LeftSidebar.css'
 
 const LeftSidebar = () => {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  
   const userAvatar = user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullName || 'User')}`
 
   const groups = [
@@ -12,10 +15,14 @@ const LeftSidebar = () => {
     { name: 'AI & Machine Learning', icon: 'memory' },
   ]
 
+  const handleProfileClick = () => {
+    navigate('/profile')
+  }
+
   return (
     <aside className="left-sidebar">
-      {/* Profile Card */}
-      <div className="profile-card">
+      {/* Profile Card - Clickable */}
+      <div className="profile-card" onClick={handleProfileClick}>
         <div className="profile-cover">
           <div className="profile-cover-image"></div>
           <div className="profile-cover-overlay"></div>

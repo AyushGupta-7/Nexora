@@ -1,5 +1,38 @@
 const mongoose = require('mongoose')
 
+const skillSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  endorsements: {
+    type: Number,
+    default: 0
+  }
+})
+
+const experienceSchema = new mongoose.Schema({
+  company: { type: String, required: true },
+  position: { type: String, required: true },
+  location: { type: String },
+  startDate: { type: String },
+  endDate: { type: String },
+  current: { type: Boolean, default: false },
+  description: { type: String },
+  logo: { type: String }
+})
+
+const educationSchema = new mongoose.Schema({
+  school: { type: String, required: true },
+  degree: { type: String, required: true },
+  field: { type: String },
+  startDate: { type: String },
+  endDate: { type: String },
+  description: { type: String },
+  activities: { type: String }
+})
+
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -32,6 +65,23 @@ const userSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Title cannot exceed 100 characters'],
   },
+  location: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  about: {
+    type: String,
+    default: '',
+    maxlength: [1000, 'About cannot exceed 1000 characters'],
+  },
+  coverImage: {
+    type: String,
+    default: '',
+  },
+  skills: [skillSchema],
+  experiences: [experienceSchema],
+  educations: [educationSchema],
 }, {
   timestamps: true,
 })

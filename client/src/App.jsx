@@ -4,6 +4,7 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Home from './pages/Home'
+import Profile from './pages/Profile'
 import { useAuth } from './context/AuthContext'
 import './App.css'
 
@@ -23,7 +24,7 @@ function App() {
       <Routes>
         <Route 
           path="/" 
-          element={isAuthenticated ? <Home /> : <Navigate to="/register" replace />} 
+          element={isAuthenticated ? <Home /> : <Navigate to="/login" replace />} 
         />
         <Route 
           path="/register" 
@@ -36,6 +37,10 @@ function App() {
         <Route 
           path="/dashboard" 
           element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/profile" 
+          element={isAuthenticated ? <Profile /> : <Navigate to="/login" replace />} 
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

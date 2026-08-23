@@ -1,21 +1,21 @@
-.left-sidebar {
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-}
-
-@media (min-width: 1024px) {
-  .left-sidebar { display: flex; }
-}
-
+/* Add cursor pointer and hover effect to profile card */
 .profile-card {
   background: var(--color-surface-container);
   border: 1px solid var(--color-outline-variant);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer; /* ✅ Makes it clickable */
+  transition: all 0.3s ease; /* ✅ Smooth transition */
 }
 
+.profile-card:hover {
+  border-color: var(--color-secondary);
+  transform: translateY(-2px); /* ✅ Slight lift effect */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Keep the rest of your existing styles */
 .profile-cover {
   height: 64px;
   width: 100%;
@@ -32,7 +32,9 @@
   transition: opacity 0.5s ease;
 }
 
-.profile-card:hover .profile-cover-image { opacity: 1; }
+.profile-card:hover .profile-cover-image {
+  opacity: 1;
+}
 
 .profile-cover-overlay {
   position: absolute;
@@ -60,7 +62,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .profile-name {
   font-size: 24px;
@@ -84,12 +90,14 @@
   margin-top: 4px;
 }
 
+/* Groups Widget */
 .groups-widget {
   background: var(--color-surface-container);
   border: 1px solid var(--color-outline-variant);
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
 }
 
 .widget-title {
@@ -118,8 +126,13 @@
   transition: all 0.2s ease;
 }
 
-.group-item:hover { background: var(--color-surface-variant); }
-.group-item:hover .group-name { color: var(--color-secondary); }
+.group-item:hover {
+  background: var(--color-surface-variant);
+}
+
+.group-item:hover .group-name {
+  color: var(--color-secondary);
+}
 
 .group-icon {
   width: 32px;

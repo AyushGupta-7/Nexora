@@ -1,0 +1,239 @@
+.skills-section {
+  background: rgba(23, 42, 69, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #233554;
+  border-radius: 12px;
+  padding: 24px 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.skills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.skills-title {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.skills-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.skills-quiz-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--color-secondary);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-secondary);
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.skills-quiz-btn:hover {
+  background: rgba(65, 228, 192, 0.1);
+}
+
+.skills-add-btn,
+.skills-edit-btn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skills-add-btn:hover,
+.skills-edit-btn:hover {
+  background: var(--color-surface-variant);
+  color: var(--color-secondary);
+}
+
+.skills-add-btn .material-symbols-outlined,
+.skills-edit-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+}
+
+.skill-item:not(:last-child) {
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.skill-info {
+  flex: 1;
+}
+
+.skill-name {
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  color: var(--color-on-surface);
+}
+
+.skill-endorsements {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.skill-endorsements .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.skill-remove-btn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.skill-item:hover .skill-remove-btn {
+  opacity: 1;
+}
+
+.skill-remove-btn:hover {
+  background: rgba(255, 180, 171, 0.1);
+  color: var(--color-error);
+}
+
+.skill-remove-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.skill-add-form {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skill-add-input {
+  padding: 10px 16px;
+  background: var(--color-surface-container-high);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-on-surface);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.skill-add-input:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(65, 228, 192, 0.2);
+}
+
+.skill-add-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.skill-add-cancel {
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 6px;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.skill-add-cancel:hover {
+  background: var(--color-surface-variant);
+}
+
+.skill-add-submit {
+  padding: 6px 16px;
+  background: var(--color-primary-container);
+  border: none;
+  border-radius: 6px;
+  color: var(--color-on-primary-container);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.skill-add-submit:hover {
+  box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
+}
+
+.skills-show-all {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-outline-variant);
+  display: flex;
+  justify-content: center;
+}
+
+.skills-show-all-btn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+
+.skills-show-all-btn:hover {
+  color: var(--color-secondary);
+}
+
+.skills-show-all-btn .material-symbols-outlined {
+  font-size: 18px;
+}

@@ -1,0 +1,306 @@
+.experience-section {
+  background: rgba(23, 42, 69, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #233554;
+  border-radius: 12px;
+  padding: 24px 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.experience-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.experience-title {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.experience-header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.experience-add-btn,
+.experience-edit-btn {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.experience-add-btn:hover,
+.experience-edit-btn:hover {
+  background: var(--color-surface-variant);
+  color: var(--color-secondary);
+}
+
+.experience-add-btn .material-symbols-outlined,
+.experience-edit-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.experience-timeline {
+  position: relative;
+}
+
+.experience-item {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 32px;
+}
+
+.experience-item:last-child {
+  margin-bottom: 0;
+}
+
+.experience-item-line {
+  position: absolute;
+  left: 24px;
+  top: 40px;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-secondary);
+  opacity: 0.3;
+}
+
+.experience-item:last-child .experience-item-line {
+  display: none;
+}
+
+.experience-item-content {
+  position: relative;
+}
+
+.experience-item-header {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+
+.experience-item-logo {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: var(--color-surface-container-highest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.experience-item-logo img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.experience-item-logo .material-symbols-outlined {
+  font-size: 24px;
+  color: var(--color-secondary);
+}
+
+.experience-item-info {
+  flex: 1;
+}
+
+.experience-item-position {
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  color: var(--color-on-surface);
+}
+
+.experience-item-company {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-on-surface-variant);
+}
+
+.experience-item-date {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-on-surface-variant);
+  margin-bottom: 8px;
+}
+
+.experience-item-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-on-surface-variant);
+  margin-bottom: 12px;
+}
+
+.experience-item-location .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.experience-item-description {
+  list-style: disc;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-on-surface-variant);
+}
+
+.experience-item-description li {
+  margin-bottom: 4px;
+}
+
+.experience-item-remove {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0;
+  flex-shrink: 0;
+  height: 32px;
+}
+
+.experience-item:hover .experience-item-remove {
+  opacity: 1;
+}
+
+.experience-item-remove:hover {
+  background: rgba(255, 180, 171, 0.1);
+  color: var(--color-error);
+}
+
+.experience-item-remove .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.experience-add-form {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.experience-add-input {
+  padding: 10px 16px;
+  background: var(--color-surface-container-high);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-on-surface);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.experience-add-input:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(65, 228, 192, 0.2);
+}
+
+.experience-add-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.experience-add-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.experience-add-current {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+}
+
+.experience-add-current input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-secondary);
+  cursor: pointer;
+}
+
+.experience-add-textarea {
+  padding: 10px 16px;
+  background: var(--color-surface-container-high);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-on-surface);
+  font-family: 'Inter', sans-serif;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.experience-add-textarea:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(65, 228, 192, 0.2);
+}
+
+.experience-add-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.experience-add-cancel {
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 6px;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.experience-add-cancel:hover {
+  background: var(--color-surface-variant);
+}
+
+.experience-add-submit {
+  padding: 6px 16px;
+  background: var(--color-primary-container);
+  border: none;
+  border-radius: 6px;
+  color: var(--color-on-primary-container);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.experience-add-submit:hover:not(:disabled) {
+  box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
+}
+
+.experience-add-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
