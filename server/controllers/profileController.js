@@ -1,6 +1,6 @@
 const User = require('../models/User')
 
-// @desc    Get user profile
+// @desc    Get user profile (own)
 // @route   GET /api/profile
 // @access  Private
 const getProfile = async (req, res) => {
@@ -21,6 +21,34 @@ const getProfile = async (req, res) => {
     })
   } catch (error) {
     console.error('Get profile error:', error)
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error'
+    })
+  }
+}
+
+// @desc    Get user profile by ID (public)
+// @route   GET /api/profile/:userId
+// @access  Private
+const getProfileById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId)
+      .select('-password -email')
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      profile: user
+    })
+  } catch (error) {
+    console.error('Get profile by id error:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Server error'
@@ -264,13 +292,94 @@ const removeEducation = async (req, res) => {
   }
 }
 
-module.exports = {
-  getProfile,
-  updateProfile,
-  addSkill,
-  removeSkill,
-  addExperience,
-  removeExperience,
-  addEducation,
-  removeEducation
+// @desc    Upload avatar
+// @route   POST /api/profile/avatar
+// @access  Private
+const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload an image'
+      })
+    }
+
+    const user = await User.findById(req.user._id)
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    user.avatar = req.file.path
+    await user.save()
+
+    res.status(200).json({
+      success: true,
+      message: 'Avatar uploaded successfully',
+      avatar: user.avatar,
+      profile: user
+    })
+  } catch (error) {
+    console.error('Upload avatar error:', error)
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error'
+    })
+  }
 }
+
+// @desc    Upload cover image
+// @route   POST /api/profile/cover
+// @access  Private
+const uploadCover = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload an image'
+      })
+    }
+
+    const user = await User.findById(req.user._id)
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    user.coverImage = req.file.path
+    await user.save()
+
+    res.status(200).json({
+      success: true,
+      message: 'Cover image uploaded successfully',
+      coverImage: user.coverImage,
+      profile: user
+    })
+  } catch (error) {
+    console.error('Upload cover error:', error)
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error'
+    })
+  }
+}
+
+module.exports = {
+    getProfile,
+    getProfileById,
+    updateProfile,
+    uploadAvatar,
+    uploadCover,
+    addSkill,
+    removeSkill,
+    addExperience,
+    removeExperience,
+    addEducation,
+    removeEducation
+};

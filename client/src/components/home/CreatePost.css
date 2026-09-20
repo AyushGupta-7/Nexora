@@ -118,3 +118,40 @@
 }
 
 .post-submit-btn.loading { opacity: 0.7; }
+
+/* Image Preview */
+.create-post-image-preview {
+  position: relative;
+  margin: 12px 0 0 56px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-outline-variant);
+  max-height: 300px;
+}
+
+.create-post-image-preview img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.remove-image-btn:hover { background: rgba(0, 0, 0, 0.85); }
+.remove-image-btn .material-symbols-outlined { font-size: 16px; }

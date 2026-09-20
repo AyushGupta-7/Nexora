@@ -9,9 +9,46 @@ export const getProfile = async () => {
   }
 }
 
+export const getProfileById = async (userId) => {
+  try {
+    const response = await api.get(`/profile/${userId}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 export const updateProfile = async (profileData) => {
   try {
     const response = await api.put('/profile', profileData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+// ✅ Upload avatar
+export const uploadAvatar = async (formData) => {
+  try {
+    const response = await api.post('/profile/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+// ✅ Upload cover image
+export const uploadCover = async (formData) => {
+  try {
+    const response = await api.post('/profile/cover', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
     return response.data
   } catch (error) {
     throw error

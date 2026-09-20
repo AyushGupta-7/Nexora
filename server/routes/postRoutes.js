@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { protect } = require('../middleware/auth')
+const { postUpload } = require('../middleware/upload')
 const {
   getPosts,
   getPost,
@@ -20,7 +21,7 @@ const {
 // Post CRUD
 router.route('/')
   .get(protect, getPosts)
-  .post(protect, createPost)
+  .post(protect, postUpload.single('image'), createPost)
 
 router.route('/:id')
   .get(protect, getPost)

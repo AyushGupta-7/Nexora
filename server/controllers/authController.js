@@ -148,14 +148,27 @@ const login = async (req, res) => {
 // @access  Private
 const getMe = async (req, res) => {
   try {
-    const user = req.user
+    const user = await User.findById(req.user._id).select('-password')
     
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      })
+    }
+
     res.status(200).json({
       success: true,
       user: {
         id: user._id,
+        _id: user._id,
         fullName: user.fullName,
         email: user.email,
+        avatar: user.avatar,
+        title: user.title,
+        location: user.location,
+        about: user.about,
+        coverImage: user.coverImage,
         createdAt: user.createdAt,
       },
     })

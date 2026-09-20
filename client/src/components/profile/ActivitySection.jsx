@@ -8,13 +8,14 @@ import './ActivitySection.css'
 const ActivitySection = ({ profile, user, onUpdate }) => {
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [visibleCount, setVisibleCount] = useState(2) // Initially show 2 posts
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const loadPosts = async () => {
     try {
       setLoading(true)
       const response = await getPosts()
       if (response.success) {
-        // Filter posts by user
         const userPosts = response.posts.filter(
           post => post.author?._id === user?._id
         )
@@ -35,6 +36,31 @@ const ActivitySection = ({ profile, user, onUpdate }) => {
     setPosts(prev => [newPost, ...prev])
   }
 
+  const handleShowMore = () => {
+    setLoadingMore(true)
+    // Simulate loading delay
+    setTimeout(() => {
+      setVisibleCount(prev => prev + 2)
+      setLoadingMore(false)
+    }, 500)
+  }
+
+  const visiblePosts = posts.slice(0, visibleCount)
+  const hasMore = visibleCount < posts.length
+
+  if (loading) {
+    return (
+      <section className="activity-section">
+        <div className="activity-header">
+          <h2 className="activity-title">Activity</h2>
+        </div>
+        <div className="activity-loading">
+          <div className="loader"></div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="activity-section">
       <div className="activity-header">
@@ -50,24 +76,43 @@ const ActivitySection = ({ profile, user, onUpdate }) => {
       <div className="activity-content">
         <CreatePost onPostCreated={handlePostCreated} />
         
-        {loading ? (
-          <div className="activity-loading">
-            <div className="loader"></div>
-          </div>
-        ) : posts.length === 0 ? (
+        {posts.length === 0 ? (
           <div className="activity-empty">
             <span className="material-symbols-outlined">post_add</span>
             <p>No posts yet. Share your first post!</p>
           </div>
         ) : (
           <div className="activity-posts">
-            {posts.map((post) => (
+            {visiblePosts.map((post) => (
               <PostCard 
                 key={post._id} 
                 post={post} 
                 onPostUpdated={loadPosts} 
               />
             ))}
+            
+            {hasMore && (
+              <button 
+                className="activity-show-more"
+                onClick={handleShowMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? (
+                  <span className="activity-loader"></span>
+                ) : (
+                  <>
+                    Show More ({posts.length - visibleCount} more)
+                    <span className="material-symbols-outlined">expand_more</span>
+                  </>
+                )}
+              </button>
+            )}
+            
+            {!hasMore && posts.length > 2 && (
+              <div className="activity-all-loaded">
+                <span>You've seen all {posts.length} posts</span>
+              </div>
+            )}
           </div>
         )}
       </div>

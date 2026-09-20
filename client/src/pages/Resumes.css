@@ -1,0 +1,385 @@
+/* Resumes Page */
+.resumes-page {
+  min-height: 100vh;
+  background: var(--color-background);
+}
+
+.resumes-main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 72px 16px 32px;
+}
+
+.resumes-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.resumes-header-text h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin-bottom: 4px;
+}
+
+.resumes-subtitle {
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+}
+
+.resumes-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  background: var(--color-primary-fixed-dim);
+  color: var(--color-on-primary-fixed);
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.resumes-upload-btn .material-symbols-outlined { font-size: 18px; }
+.resumes-upload-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* States */
+.resumes-loading, .resumes-error, .resumes-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 12px;
+  color: var(--color-on-surface-variant);
+  text-align: center;
+}
+
+.resumes-empty .material-symbols-outlined,
+.resumes-error .material-symbols-outlined {
+  font-size: 48px;
+  opacity: 0.35;
+  margin-bottom: 4px;
+}
+
+.resumes-empty h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+/* Grid */
+.resumes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Resume Card */
+.resume-card {
+  background: var(--color-surface-container);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: border-color 0.2s;
+}
+
+.resume-card:hover {
+  border-color: color-mix(in srgb, var(--color-primary-fixed-dim) 60%, transparent);
+}
+
+.resume-card-icon {
+  width: 44px;
+  height: 44px;
+  background: color-mix(in srgb, var(--color-secondary-container) 20%, transparent);
+  border: 1px solid var(--color-secondary-container);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.resume-card-icon .material-symbols-outlined {
+  font-size: 22px;
+  color: var(--color-secondary);
+}
+
+.resume-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.resume-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resume-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.resume-rename-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resume-rename-input {
+  background: var(--color-surface-container-low);
+  border: 1.5px solid var(--color-primary-fixed-dim);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  color: var(--color-on-surface);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  width: 100%;
+}
+
+.resume-rename-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.resume-action-btn {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.resume-action-btn.save {
+  background: var(--color-primary-fixed-dim);
+  color: var(--color-on-primary-fixed);
+}
+
+.resume-action-btn.cancel {
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface-variant);
+}
+
+/* Card Actions */
+.resume-card-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.resume-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+
+.resume-icon-btn .material-symbols-outlined { font-size: 18px; }
+
+.resume-icon-btn:hover {
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+}
+
+.resume-icon-btn.delete:hover {
+  background: color-mix(in srgb, var(--color-error) 10%, transparent);
+  color: var(--color-error);
+}
+
+/* Upload Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-box {
+  background: var(--color-surface-container);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.modal-header h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.modal-close:hover {
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+}
+
+.modal-close .material-symbols-outlined { font-size: 20px; }
+
+.modal-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+/* Upload Area */
+.upload-area {
+  border: 2px dashed var(--color-outline-variant);
+  border-radius: 14px;
+  padding: 32px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-area:hover {
+  border-color: var(--color-primary-fixed-dim);
+  background: color-mix(in srgb, var(--color-primary-fixed-dim) 5%, transparent);
+}
+
+.upload-icon { font-size: 40px; color: var(--color-secondary); }
+.upload-hint { font-size: 14px; color: var(--color-on-surface); font-weight: 500; }
+.upload-hint-small { font-size: 12px; color: var(--color-on-surface-variant); }
+
+.upload-file-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.upload-file-selected .material-symbols-outlined { font-size: 32px; color: var(--color-secondary); }
+.upload-filename { font-size: 14px; font-weight: 600; color: var(--color-on-surface); word-break: break-all; }
+.upload-filesize { font-size: 12px; color: var(--color-on-surface-variant); }
+
+.modal-field { display: flex; flex-direction: column; gap: 6px; }
+.modal-label { font-size: 13px; font-weight: 600; color: var(--color-on-surface); }
+
+.modal-input {
+  background: var(--color-surface-container-low);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--color-on-surface);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-input:focus { border-color: var(--color-primary-fixed-dim); }
+.modal-input::placeholder { color: var(--color-on-surface-variant); }
+
+.modal-error {
+  font-size: 13px;
+  color: var(--color-error);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.modal-btn-primary {
+  background: var(--color-primary-fixed-dim);
+  color: var(--color-on-primary-fixed);
+}
+
+.modal-btn-primary:hover:not(:disabled) { opacity: 0.9; }
+.modal-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.modal-btn-ghost {
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface-variant);
+}
+
+.modal-btn-ghost:hover { color: var(--color-on-surface); }
+
+/* Loader */
+.loader {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-outline-variant);
+  border-top-color: var(--color-secondary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .resumes-main { padding: 64px 12px 24px; }
+  .resumes-header { flex-direction: column; align-items: flex-start; }
+  .resume-card { flex-wrap: wrap; }
+}

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '../../context/AuthContext'
 import { likeComment, unlikeComment } from '../../services/postService'
+import './Reply.css'
 
 const Reply = ({ reply, postId, commentId, postAuthorId, onReplyDeleted }) => {
   const { user } = useAuth()
@@ -53,18 +54,20 @@ const Reply = ({ reply, postId, commentId, postAuthorId, onReplyDeleted }) => {
         <img src={replyAuthorAvatar} alt={replyAuthorName} />
       </div>
       <div className="reply-content">
-        <div className="reply-header">
-          <span className="reply-author">{replyAuthorName}</span>
-          <span className="reply-time">{formatDate(reply.createdAt)}</span>
+        <div className="reply-bubble">
+          <div className="reply-header">
+            <span className="reply-author">{replyAuthorName}</span>
+            <span className="reply-time">{formatDate(reply.createdAt)}</span>
+          </div>
+          <p className="reply-text">{reply.content}</p>
         </div>
-        <p className="reply-text">{reply.content}</p>
         <div className="reply-actions">
           <button 
             className={`reply-like-btn ${replyLiked ? 'liked' : ''}`}
             onClick={handleReplyLike}
             disabled={loading}
           >
-            <span className="material-symbols-outlined">{replyLiked ? 'thumb_up' : 'thumb_up'}</span>
+            <span className="material-symbols-outlined">thumb_up</span>
             <span>{replyLikesCount}</span>
           </button>
           {/* ✅ Delete button - always visible, shown only if user can delete */}

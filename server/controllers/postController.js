@@ -1,11 +1,16 @@
 const Post = require('../models/Post')
 
-// @desc    Get all posts
+// @desc    Get all posts (with optional ?author=userId filter)
 // @route   GET /api/posts
 // @access  Private
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find()
+    const filter = {}
+    if (req.query.author) {
+      filter.author = req.query.author
+    }
+
+    const posts = await Post.find(filter)
       .populate('author', 'fullName email avatar title')
       .populate('likes', 'fullName')
       .populate('comments.author', 'fullName email avatar')
@@ -93,25 +98,35 @@ const getPost = async (req, res) => {
   }
 }
 
-// @desc    Create post
+// @desc    Create post (with optional image)
 // @route   POST /api/posts
 // @access  Private
 const createPost = async (req, res) => {
   try {
-    const { content, media, tags } = req.body
+    const { content, tags } = req.body
 
-    if (!content) {
+    if (!content || !content.trim()) {
       return res.status(400).json({
         success: false,
         message: 'Please provide content for the post',
       })
     }
 
+    // Handle image upload
+    const mediaArray = []
+    if (req.file) {
+      mediaArray.push({
+        url: req.file.path,
+        publicId: req.file.filename || '',
+        type: 'image',
+      })
+    }
+
     const post = await Post.create({
       author: req.user._id,
-      content,
-      media: media || [],
-      tags: tags || [],
+      content: content.trim(),
+      media: mediaArray,
+      tags: tags ? (Array.isArray(tags) ? tags : [tags]) : [],
     })
 
     const populatedPost = await Post.findById(post._id)
