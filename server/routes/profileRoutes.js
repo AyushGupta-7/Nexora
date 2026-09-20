@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { protect } = require('../middleware/auth')
 const upload = require('../middleware/upload')
+const { coverUpload } = require('../middleware/upload')
 const {
   getProfile,
   getProfileById,
@@ -26,7 +27,7 @@ router.route('/avatar')
   .post(protect, upload.single('avatar'), uploadAvatar)
 
 router.route('/cover')
-  .post(protect, upload.single('cover'), uploadCover)
+  .post(protect, coverUpload.single('cover'), uploadCover)
 
 router.route('/skills')
   .post(protect, addSkill)

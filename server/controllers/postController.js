@@ -105,10 +105,10 @@ const createPost = async (req, res) => {
   try {
     const { content, tags } = req.body
 
-    if (!content || !content.trim()) {
+    if (!content?.trim() && !req.file) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide content for the post',
+        message: 'Please provide text or an image for the post',
       })
     }
 

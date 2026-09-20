@@ -39,8 +39,9 @@ const EducationSection = ({ profile, onUpdate }) => {
     }
   }
 
-  const handleRemove = async (id) => {
-    const updatedEducations = educations.filter(edu => edu.id !== id)
+  const handleRemove = async (edu) => {
+    const eduKey = edu._id || edu.id
+    const updatedEducations = educations.filter(e => (e._id || e.id) !== eduKey)
     const result = await onUpdate({ educations: updatedEducations })
     if (result.success) {
       setEducations(updatedEducations)
@@ -66,7 +67,7 @@ const EducationSection = ({ profile, onUpdate }) => {
 
       <div className="education-list">
         {educations.map((edu) => (
-          <div key={edu.id} className="education-item">
+          <div key={edu._id || edu.id} className="education-item">
             <div className="education-item-icon">
               <span className="material-symbols-outlined">school</span>
             </div>
@@ -87,7 +88,7 @@ const EducationSection = ({ profile, onUpdate }) => {
             </div>
             <button 
               className="education-item-remove"
-              onClick={() => handleRemove(edu.id)}
+              onClick={() => handleRemove(edu)}
             >
               <span className="material-symbols-outlined">close</span>
             </button>

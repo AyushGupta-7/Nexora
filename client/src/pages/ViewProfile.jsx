@@ -128,9 +128,10 @@ const ViewProfile = () => {
             </button>
             <button className="vp-btn vp-btn-ghost" onClick={handleRemove} disabled={actionLoading}>
               <span className="material-symbols-outlined">person_remove</span>
-              Connected
+              {actionLoading ? '...' : 'Disconnect'}
             </button>
           </div>
+
         )
       case 'pending_sent':
         return (

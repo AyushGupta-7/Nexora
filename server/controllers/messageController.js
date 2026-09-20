@@ -1,6 +1,10 @@
 const Conversation = require('../models/Conversation')
 const Message = require('../models/Message')
 const User = require('../models/User')
+const mongoose = require('mongoose')
+
+// Helper: validate ObjectId
+const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
 // @desc    Get or create conversation between two users
 // @route   POST /api/messages/conversation
@@ -13,6 +17,10 @@ const getOrCreateConversation = async (req, res) => {
       return res.status(400).json({ success: false, message: 'userId is required' })
     }
 
+    if (!isValidId(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid userId' })
+    }
+
     if (userId === req.user._id.toString()) {
       return res.status(400).json({ success: false, message: 'Cannot message yourself' })
     }
@@ -22,7 +30,6 @@ const getOrCreateConversation = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' })
     }
 
-    // Find existing conversation
     let conversation = await Conversation.findOne({
       participants: { $all: [req.user._id, userId] },
     }).populate('participants', 'fullName avatar title')
@@ -39,7 +46,7 @@ const getOrCreateConversation = async (req, res) => {
     res.status(200).json({ success: true, conversation })
   } catch (error) {
     console.error('Get/create conversation error:', error)
-    res.status(500).json({ success: false, message: error.message || 'Server error' })
+    res.status(500).json({ success: false, message: 'Failed to get or create conversation' })
   }
 }
 
@@ -58,7 +65,7 @@ const getConversations = async (req, res) => {
     res.status(200).json({ success: true, conversations })
   } catch (error) {
     console.error('Get conversations error:', error)
-    res.status(500).json({ success: false, message: error.message || 'Server error' })
+    res.status(500).json({ success: false, message: 'Failed to load conversations' })
   }
 }
 
@@ -67,48 +74,59 @@ const getConversations = async (req, res) => {
 // @access  Private
 const getMessages = async (req, res) => {
   try {
-    const conversation = await Conversation.findById(req.params.conversationId)
+    const { conversationId } = req.params
 
+    if (!isValidId(conversationId)) {
+      return res.status(400).json({ success: false, message: 'Invalid conversation ID' })
+    }
+
+    const conversation = await Conversation.findById(conversationId)
     if (!conversation) {
       return res.status(404).json({ success: false, message: 'Conversation not found' })
     }
 
-    // Ensure current user is a participant
     const isParticipant = conversation.participants.some(
       p => p.toString() === req.user._id.toString()
     )
-
     if (!isParticipant) {
-      return res.status(403).json({ success: false, message: 'Not authorized' })
+      return res.status(403).json({ success: false, message: 'Not authorized to view this conversation' })
     }
 
-    const messages = await Message.find({ conversation: req.params.conversationId })
+    const messages = await Message.find({ conversation: conversationId })
       .populate('sender', 'fullName avatar')
       .sort({ createdAt: 1 })
       .limit(100)
 
     // Mark messages as read
     await Message.updateMany(
-      { conversation: req.params.conversationId, sender: { $ne: req.user._id }, read: false },
+      { conversation: conversationId, sender: { $ne: req.user._id }, read: false },
       { read: true }
     )
 
     res.status(200).json({ success: true, messages })
   } catch (error) {
     console.error('Get messages error:', error)
-    res.status(500).json({ success: false, message: error.message || 'Server error' })
+    res.status(500).json({ success: false, message: 'Failed to load messages' })
   }
 }
 
-// @desc    Send a message
+// @desc    Send a text message
 // @route   POST /api/messages
 // @access  Private
 const sendMessage = async (req, res) => {
   try {
     const { conversationId, content } = req.body
 
-    if (!conversationId || !content || !content.trim()) {
-      return res.status(400).json({ success: false, message: 'conversationId and content are required' })
+    if (!conversationId) {
+      return res.status(400).json({ success: false, message: 'conversationId is required' })
+    }
+
+    if (!isValidId(conversationId)) {
+      return res.status(400).json({ success: false, message: 'Invalid conversationId' })
+    }
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({ success: false, message: 'Message content is required' })
     }
 
     const conversation = await Conversation.findById(conversationId)
@@ -127,9 +145,9 @@ const sendMessage = async (req, res) => {
       conversation: conversationId,
       sender: req.user._id,
       content: content.trim(),
+      messageType: 'text',
     })
 
-    // Update conversation's last message
     conversation.lastMessage = message._id
     conversation.lastMessageAt = new Date()
     await conversation.save()
@@ -137,13 +155,75 @@ const sendMessage = async (req, res) => {
     const populatedMessage = await Message.findById(message._id)
       .populate('sender', 'fullName avatar title')
 
-    res.status(201).json({
-      success: true,
-      message: populatedMessage,
-    })
+    res.status(201).json({ success: true, message: populatedMessage })
   } catch (error) {
     console.error('Send message error:', error)
-    res.status(500).json({ success: false, message: error.message || 'Server error' })
+    res.status(500).json({ success: false, message: 'Failed to send message' })
+  }
+}
+
+// @desc    Send a message with image (multipart)
+// @route   POST /api/messages/media
+// @access  Private
+const sendMediaMessage = async (req, res) => {
+  try {
+    const { conversationId, content } = req.body
+
+    if (!conversationId) {
+      return res.status(400).json({ success: false, message: 'conversationId is required' })
+    }
+
+    if (!isValidId(conversationId)) {
+      return res.status(400).json({ success: false, message: 'Invalid conversationId' })
+    }
+
+    if (!req.file && (!content || !content.trim())) {
+      return res.status(400).json({ success: false, message: 'Message must have text or an image' })
+    }
+
+    const conversation = await Conversation.findById(conversationId)
+    if (!conversation) {
+      return res.status(404).json({ success: false, message: 'Conversation not found' })
+    }
+
+    const isParticipant = conversation.participants.some(
+      p => p.toString() === req.user._id.toString()
+    )
+    if (!isParticipant) {
+      return res.status(403).json({ success: false, message: 'Not authorized' })
+    }
+
+    const messageData = {
+      conversation: conversationId,
+      sender: req.user._id,
+      messageType: req.file ? 'image' : 'text',
+    }
+
+    if (content && content.trim()) {
+      messageData.content = content.trim()
+    }
+
+    if (req.file) {
+      messageData.media = {
+        url: req.file.path || req.file.location,
+        publicId: req.file.filename || '',
+        type: 'image',
+      }
+    }
+
+    const message = await Message.create(messageData)
+
+    conversation.lastMessage = message._id
+    conversation.lastMessageAt = new Date()
+    await conversation.save()
+
+    const populatedMessage = await Message.findById(message._id)
+      .populate('sender', 'fullName avatar title')
+
+    res.status(201).json({ success: true, message: populatedMessage })
+  } catch (error) {
+    console.error('Send media message error:', error)
+    res.status(500).json({ success: false, message: 'Failed to send message' })
   }
 }
 
@@ -152,4 +232,5 @@ module.exports = {
   getConversations,
   getMessages,
   sendMessage,
+  sendMediaMessage,
 }

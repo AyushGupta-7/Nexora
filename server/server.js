@@ -138,12 +138,24 @@ app.get('/api/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message)
+  // Multer errors
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ success: false, message: 'File is too large. Maximum size allowed is exceeded.' })
+  }
+  if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+    return res.status(400).json({ success: false, message: 'Unexpected file field.' })
+  }
+  if (err.message && err.message.includes('Only')) {
+    return res.status(400).json({ success: false, message: err.message })
+  }
+
+  console.error('Server error:', err.message)
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal Server Error',
   })
 })
+
 
 // Start server
 const PORT = process.env.PORT || 5000

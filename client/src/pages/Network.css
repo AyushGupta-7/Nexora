@@ -170,11 +170,22 @@
   color: var(--color-on-surface);
 }
 
+.network-btn-disconnect {
+  background: transparent;
+  color: var(--color-error);
+  border: 1.5px solid var(--color-error);
+}
+
+.network-btn-disconnect:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-error) 10%, transparent);
+}
+
 .network-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
+
 
 /* Content Area */
 .network-content {

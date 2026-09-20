@@ -26,6 +26,21 @@ const UserCard = ({ user, onAction }) => {
     }
   }
 
+  const handleDisconnect = async (e) => {
+    e.stopPropagation()
+    if (!window.confirm(`Disconnect from ${user.fullName}?`)) return
+    setLoading(true)
+    try {
+      await removeConnection(user._id)
+      setStatus('none')
+      if (onAction) onAction()
+    } catch (err) {
+      console.error('Disconnect error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleMessage = async (e) => {
     e.stopPropagation()
     try {
@@ -56,8 +71,8 @@ const UserCard = ({ user, onAction }) => {
 
       {user.skills && user.skills.length > 0 && (
         <div className="user-card-skills">
-          {user.skills.slice(0, 3).map((skill, idx) => (
-            <span key={idx} className="user-card-skill">{skill.name}</span>
+          {user.skills.slice(0, 3).map((skill) => (
+            <span key={skill._id || skill.name} className="user-card-skill">{skill.name}</span>
           ))}
           {user.skills.length > 3 && (
             <span className="user-card-skill-more">+{user.skills.length - 3}</span>
@@ -69,7 +84,7 @@ const UserCard = ({ user, onAction }) => {
         {status === 'none' && (
           <button className="network-btn network-btn-primary" onClick={handleConnect} disabled={loading}>
             <span className="material-symbols-outlined">person_add</span>
-            Connect
+            {loading ? 'Connecting...' : 'Connect'}
           </button>
         )}
         {status === 'pending_sent' && (
@@ -79,15 +94,22 @@ const UserCard = ({ user, onAction }) => {
           </button>
         )}
         {status === 'connected' && (
-          <button className="network-btn network-btn-secondary" onClick={handleMessage}>
-            <span className="material-symbols-outlined">chat</span>
-            Message
-          </button>
+          <>
+            <button className="network-btn network-btn-secondary" onClick={handleMessage}>
+              <span className="material-symbols-outlined">chat</span>
+              Message
+            </button>
+            <button className="network-btn network-btn-disconnect" onClick={handleDisconnect} disabled={loading}>
+              <span className="material-symbols-outlined">person_remove</span>
+              {loading ? '...' : 'Disconnect'}
+            </button>
+          </>
         )}
       </div>
     </div>
   )
 }
+
 
 const RequestCard = ({ request, onAction }) => {
   const navigate = useNavigate()

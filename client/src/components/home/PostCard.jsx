@@ -237,11 +237,22 @@ const PostCard = ({ post, onPostUpdated }) => {
       </div>
 
       {/* Media */}
-      {post.media && post.media.length > 0 && (
-        <div className="post-media">
-          <img src={post.media[0]} alt="Post media" />
-        </div>
-      )}
+      {post.media && post.media.length > 0 && (() => {
+        const mediaItem = post.media[0]
+        const mediaUrl = typeof mediaItem === 'string' ? mediaItem : mediaItem?.url
+        return mediaUrl ? (
+          <div className="post-media">
+            <a href={mediaUrl} target="_blank" rel="noopener noreferrer">
+              <img
+                src={mediaUrl}
+                alt="Post media"
+                onError={(e) => { e.target.style.display = 'none' }}
+              />
+            </a>
+          </div>
+        ) : null
+      })()}
+
 
       {/* Interactions */}
       <div className="post-interactions">

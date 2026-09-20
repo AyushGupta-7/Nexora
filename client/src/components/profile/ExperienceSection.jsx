@@ -44,8 +44,9 @@ const ExperienceSection = ({ profile, onUpdate }) => {
     }
   }
 
-  const handleRemove = async (id) => {
-    const updatedExperiences = experiences.filter(exp => exp.id !== id)
+  const handleRemove = async (exp) => {
+    const expKey = exp._id || exp.id
+    const updatedExperiences = experiences.filter(e => (e._id || e.id) !== expKey)
     const result = await onUpdate({ experiences: updatedExperiences })
     if (result.success) {
       setExperiences(updatedExperiences)
@@ -71,7 +72,7 @@ const ExperienceSection = ({ profile, onUpdate }) => {
 
       <div className="experience-timeline">
         {experiences.map((exp) => (
-          <div key={exp.id} className="experience-item">
+          <div key={exp._id || exp.id} className="experience-item">
             <div className="experience-item-line"></div>
             <div className="experience-item-content">
               <div className="experience-item-header">
