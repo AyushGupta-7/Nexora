@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Navbar from '../components/layout/Navbar'
+import ConfirmModal from '../components/common/ConfirmModal'
 import { getResumes, uploadResume, renameResume, deleteResume } from '../services/resumeService'
 import { formatDistanceToNow } from 'date-fns'
 import './Resumes.css'
@@ -15,6 +16,8 @@ const Resumes = () => {
   const [uploadError, setUploadError] = useState('')
   const [renamingId, setRenamingId] = useState(null)
   const [renameValue, setRenameValue] = useState('')
+  const [deleteResumeId, setDeleteResumeId] = useState(null)
+  const [deleteResumeLoading, setDeleteResumeLoading] = useState(false)
 
   useEffect(() => {
     loadResumes()
@@ -96,15 +99,22 @@ const Resumes = () => {
     }
   }
 
-  const handleDelete = async (resumeId) => {
-    if (!window.confirm('Delete this resume? This cannot be undone.')) return
+  const handleDelete = (resumeId) => {
+    setDeleteResumeId(resumeId)
+  }
+
+  const confirmDelete = async () => {
+    setDeleteResumeLoading(true)
     try {
-      const response = await deleteResume(resumeId)
+      const response = await deleteResume(deleteResumeId)
       if (response.success) {
-        setResumes(prev => prev.filter(r => r._id !== resumeId))
+        setResumes(prev => prev.filter(r => r._id !== deleteResumeId))
+        setDeleteResumeId(null)
       }
     } catch (err) {
       console.error('Delete error:', err)
+    } finally {
+      setDeleteResumeLoading(false)
     }
   }
 
@@ -278,6 +288,16 @@ const Resumes = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteResumeId}
+        title="Delete this resume?"
+        message="This action cannot be undone. The resume file will be permanently removed."
+        confirmLabel="Delete"
+        loading={deleteResumeLoading}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteResumeId(null)}
+      />
     </div>
   )
 }

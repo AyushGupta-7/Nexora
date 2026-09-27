@@ -397,6 +397,141 @@
   .messages-main { margin-top: 60px; height: calc(100vh - 60px); }
 }
 
+/* ── Attach button ──────────────────────────────────────────────── */
+.chat-attach-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: none;
+  border: 1.5px solid var(--color-outline-variant);
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.chat-attach-btn:hover:not(:disabled) {
+  background: var(--color-surface-container-high);
+  color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+.chat-attach-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.chat-attach-btn .material-symbols-outlined { font-size: 20px; }
+
+/* ── Image preview before sending ───────────────────────────────── */
+.chat-image-preview {
+  position: relative;
+  padding: 8px 20px 0;
+  background: var(--color-surface-container);
+}
+.chat-image-preview img {
+  max-height: 120px;
+  max-width: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1.5px solid var(--color-outline-variant);
+}
+.chat-image-remove {
+  position: absolute;
+  top: 4px;
+  left: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.65);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chat-image-remove .material-symbols-outlined { font-size: 14px; }
+
+/* ── Send error banner ───────────────────────────────────────────── */
+.chat-send-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: color-mix(in srgb, var(--color-error) 12%, var(--color-surface-container));
+  border-top: 1px solid color-mix(in srgb, var(--color-error) 25%, transparent);
+  color: var(--color-error);
+  font-size: 13px;
+}
+.chat-send-error .material-symbols-outlined { font-size: 17px; }
+.chat-send-error button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+}
+
+/* ── Image message bubble ────────────────────────────────────────── */
+.msg-bubble-image {
+  padding: 4px !important;
+  background: transparent !important;
+  border: none !important;
+}
+.msg-image {
+  max-width: 240px;
+  max-height: 240px;
+  border-radius: 14px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.msg-image:hover { opacity: 0.88; }
+.msg-image-error {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  padding: 8px 12px;
+  display: block;
+}
+
+/* ── Temp / sending state ────────────────────────────────────────── */
+.msg-temp { opacity: 0.75; }
+.msg-bubble-sending { opacity: 0.65; }
+
+.msg-image-sending {
+  width: 180px;
+  height: 120px;
+  border-radius: 14px;
+  background: var(--color-surface-container-high);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.msg-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-on-surface-variant);
+}
+.msg-image-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid var(--color-outline-variant);
+  border-top-color: var(--color-secondary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.msg-image-sending-label { font-size: 12px; }
+
+/* ── State center inside chat-messages ───────────────────────────── */
+.chat-messages .messages-state-center {
+  flex: 1;
+  min-height: 200px;
+}
+
+
 /* Attach button */
 .chat-attach-btn {
   width: 38px;

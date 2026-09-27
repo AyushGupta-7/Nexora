@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
+import ConfirmModal from '../components/common/ConfirmModal'
 import { getUsers, getRequests, getConnections, sendRequest, acceptRequest, rejectRequest, removeConnection } from '../services/networkService'
 import { getOrCreateConversation } from '../services/messageService'
 import './Network.css'
@@ -9,6 +10,8 @@ const UserCard = ({ user, onAction }) => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState(user.connectionStatus || 'none')
+  const [showDisconnectModal, setShowDisconnectModal] = useState(false)
+  const [disconnectLoading, setDisconnectLoading] = useState(false)
 
   const avatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=00dce3&color=041329`
 
@@ -26,18 +29,22 @@ const UserCard = ({ user, onAction }) => {
     }
   }
 
-  const handleDisconnect = async (e) => {
+  const handleDisconnect = (e) => {
     e.stopPropagation()
-    if (!window.confirm(`Disconnect from ${user.fullName}?`)) return
-    setLoading(true)
+    setShowDisconnectModal(true)
+  }
+
+  const confirmDisconnect = async () => {
+    setDisconnectLoading(true)
     try {
       await removeConnection(user._id)
       setStatus('none')
+      setShowDisconnectModal(false)
       if (onAction) onAction()
     } catch (err) {
       console.error('Disconnect error:', err)
     } finally {
-      setLoading(false)
+      setDisconnectLoading(false)
     }
   }
 
@@ -54,6 +61,7 @@ const UserCard = ({ user, onAction }) => {
   }
 
   return (
+    <>
     <div className="user-card" onClick={() => navigate(`/profile/${user._id}`)}>
       <div className="user-card-header">
         <img src={avatar} alt={user.fullName} className="user-card-avatar" />
@@ -99,16 +107,28 @@ const UserCard = ({ user, onAction }) => {
               <span className="material-symbols-outlined">chat</span>
               Message
             </button>
-            <button className="network-btn network-btn-disconnect" onClick={handleDisconnect} disabled={loading}>
+            <button className="network-btn network-btn-disconnect" onClick={handleDisconnect} disabled={disconnectLoading}>
               <span className="material-symbols-outlined">person_remove</span>
-              {loading ? '...' : 'Disconnect'}
+              {disconnectLoading ? '...' : 'Disconnect'}
             </button>
           </>
         )}
       </div>
     </div>
+
+    <ConfirmModal
+      isOpen={showDisconnectModal}
+      title={`Disconnect from ${user.fullName}?`}
+      message="You will no longer be connected with this person."
+      confirmLabel="Disconnect"
+      loading={disconnectLoading}
+      onConfirm={confirmDisconnect}
+      onCancel={() => setShowDisconnectModal(false)}
+    />
+  </>
   )
 }
+
 
 
 const RequestCard = ({ request, onAction }) => {

@@ -35,12 +35,11 @@ const messageSchema = new mongoose.Schema({
   timestamps: true,
 })
 
-// Validate: must have content OR media
-messageSchema.pre('save', function (next) {
+// Validate: must have content OR media — async pattern (Mongoose 7+/9+)
+messageSchema.pre('save', async function () {
   if (!this.content && !this.media?.url) {
-    return next(new Error('Message must have text content or media'))
+    throw new Error('Message must have text content or media')
   }
-  next()
 })
 
 messageSchema.index({ conversation: 1, createdAt: 1 })

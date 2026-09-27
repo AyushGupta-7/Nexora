@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '../../context/AuthContext'
 import Comment from './Comment'
+import ConfirmModal from '../common/ConfirmModal'
 import { 
   likePost, 
   unlikePost, 
@@ -24,6 +25,11 @@ const PostCard = ({ post, onPostUpdated }) => {
   const [showMenu, setShowMenu] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState(post.content)
+  // Confirmation modals
+  const [deletePostModal, setDeletePostModal] = useState(false)
+  const [deletePostLoading, setDeletePostLoading] = useState(false)
+  const [deleteCommentId, setDeleteCommentId] = useState(null)
+  const [deleteCommentLoading, setDeleteCommentLoading] = useState(false)
 
   const author = post.author || {}
   const authorName = author.fullName || 'Unknown User'
@@ -83,17 +89,21 @@ const PostCard = ({ post, onPostUpdated }) => {
   }
 
   // Delete Post
-  const handleDeletePost = async () => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return
-    setLoading(true)
+  const handleDeletePost = () => {
+    setShowMenu(false)
+    setDeletePostModal(true)
+  }
+
+  const confirmDeletePost = async () => {
+    setDeletePostLoading(true)
     try {
       await deletePost(post._id)
+      setDeletePostModal(false)
       if (onPostUpdated) onPostUpdated()
     } catch (error) {
-      console.error('Delete error:', error)
+      console.error('Delete post error:', error)
     } finally {
-      setLoading(false)
-      setShowMenu(false)
+      setDeletePostLoading(false)
     }
   }
 
@@ -118,14 +128,21 @@ const PostCard = ({ post, onPostUpdated }) => {
   }
 
   // Delete Comment
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Delete this comment?')) return
+  const handleDeleteComment = (commentId) => {
+    setDeleteCommentId(commentId)
+  }
+
+  const confirmDeleteComment = async () => {
+    setDeleteCommentLoading(true)
     try {
-      await deleteComment(post._id, commentId)
-      setComments(prev => prev.filter(c => c._id !== commentId))
+      await deleteComment(post._id, deleteCommentId)
+      setComments(prev => prev.filter(c => c._id !== deleteCommentId))
+      setDeleteCommentId(null)
       if (onPostUpdated) onPostUpdated()
     } catch (error) {
       console.error('Delete comment error:', error)
+    } finally {
+      setDeleteCommentLoading(false)
     }
   }
 
@@ -161,6 +178,7 @@ const PostCard = ({ post, onPostUpdated }) => {
   }
 
   return (
+    <>
     <article className="post-card">
       {/* Header */}
       <div className="post-header">
@@ -313,7 +331,30 @@ const PostCard = ({ post, onPostUpdated }) => {
         </div>
       )}
     </article>
+
+    {/* Delete Post Modal */}
+    <ConfirmModal
+      isOpen={deletePostModal}
+      title="Delete this post?"
+      message="This action cannot be undone. The post and all its comments will be permanently removed."
+      confirmLabel="Delete"
+      loading={deletePostLoading}
+      onConfirm={confirmDeletePost}
+      onCancel={() => setDeletePostModal(false)}
+    />
+
+    {/* Delete Comment Modal */}
+    <ConfirmModal
+      isOpen={!!deleteCommentId}
+      title="Delete this comment?"
+      message="The comment will be permanently removed."
+      confirmLabel="Delete"
+      loading={deleteCommentLoading}
+      onConfirm={confirmDeleteComment}
+      onCancel={() => setDeleteCommentId(null)}
+    />
+  </>
   )
 }
 
-export default PostCard
+export default PostCard

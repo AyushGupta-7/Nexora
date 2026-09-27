@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/layout/Navbar'
+import ConfirmModal from '../components/common/ConfirmModal'
 import { getProfileById } from '../services/profileService'
 import { sendRequest, acceptRequest, rejectRequest, removeConnection } from '../services/networkService'
 import { getOrCreateConversation } from '../services/messageService'
@@ -21,6 +22,8 @@ const ViewProfile = () => {
   const [connectionStatus, setConnectionStatus] = useState('none')
   const [actionLoading, setActionLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('about')
+  const [showRemoveModal, setShowRemoveModal] = useState(false)
+  const [removeModalConfig, setRemoveModalConfig] = useState({ title: '', message: '', confirmLabel: '' })
 
   const currentUserId = user?._id || user?.id
 
@@ -93,12 +96,17 @@ const ViewProfile = () => {
     }
   }
 
-  const handleRemove = async () => {
-    if (!window.confirm('Remove this connection?')) return
+  const handleRemove = (config) => {
+    setRemoveModalConfig(config)
+    setShowRemoveModal(true)
+  }
+
+  const confirmRemove = async () => {
     setActionLoading(true)
     try {
       await removeConnection(userId)
       setConnectionStatus('none')
+      setShowRemoveModal(false)
     } catch (err) {
       console.error('Remove error:', err)
     } finally {
@@ -126,12 +134,19 @@ const ViewProfile = () => {
               <span className="material-symbols-outlined">chat</span>
               Message
             </button>
-            <button className="vp-btn vp-btn-ghost" onClick={handleRemove} disabled={actionLoading}>
+            <button
+              className="vp-btn vp-btn-ghost"
+              onClick={() => handleRemove({
+                title: `Disconnect from ${profile?.fullName}?`,
+                message: 'You will no longer be connected with this person.',
+                confirmLabel: 'Disconnect',
+              })}
+              disabled={actionLoading}
+            >
               <span className="material-symbols-outlined">person_remove</span>
               {actionLoading ? '...' : 'Disconnect'}
             </button>
           </div>
-
         )
       case 'pending_sent':
         return (
@@ -140,7 +155,15 @@ const ViewProfile = () => {
               <span className="material-symbols-outlined">schedule</span>
               Pending
             </button>
-            <button className="vp-btn vp-btn-ghost" onClick={handleRemove} disabled={actionLoading}>
+            <button
+              className="vp-btn vp-btn-ghost"
+              onClick={() => handleRemove({
+                title: 'Withdraw connection request?',
+                message: 'Your connection request will be cancelled.',
+                confirmLabel: 'Withdraw',
+              })}
+              disabled={actionLoading}
+            >
               Withdraw
             </button>
           </div>
@@ -152,7 +175,15 @@ const ViewProfile = () => {
               <span className="material-symbols-outlined">person_add</span>
               Accept
             </button>
-            <button className="vp-btn vp-btn-ghost" onClick={handleRemove} disabled={actionLoading}>
+            <button
+              className="vp-btn vp-btn-ghost"
+              onClick={() => handleRemove({
+                title: 'Decline this request?',
+                message: 'The connection request from this person will be removed.',
+                confirmLabel: 'Decline',
+              })}
+              disabled={actionLoading}
+            >
               Decline
             </button>
           </div>
@@ -344,6 +375,16 @@ const ViewProfile = () => {
           )}
         </div>
       </main>
+
+      <ConfirmModal
+        isOpen={showRemoveModal}
+        title={removeModalConfig.title}
+        message={removeModalConfig.message}
+        confirmLabel={removeModalConfig.confirmLabel || 'Confirm'}
+        loading={actionLoading}
+        onConfirm={confirmRemove}
+        onCancel={() => setShowRemoveModal(false)}
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
+import ConfirmModal from '../components/common/ConfirmModal'
 import { getMyApplications, withdrawApplication } from '../services/applicationService'
 import { formatDistanceToNow } from 'date-fns'
 import './Applications.css'
@@ -22,6 +23,7 @@ const ApplicationCard = ({ application, onWithdraw }) => {
   const status = application.status || 'Applied'
   const statusStyle = STATUS_STYLES[status] || STATUS_STYLES['Applied']
   const [withdrawing, setWithdrawing] = useState(false)
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false)
 
   const formatDate = (date) => {
     try { return formatDistanceToNow(new Date(date), { addSuffix: true }) }
@@ -30,11 +32,15 @@ const ApplicationCard = ({ application, onWithdraw }) => {
 
   const initials = job.company?.charAt(0) || 'J'
 
-  const handleWithdraw = async () => {
-    if (!window.confirm('Withdraw this application?')) return
+  const handleWithdraw = () => {
+    setShowWithdrawModal(true)
+  }
+
+  const confirmWithdraw = async () => {
     setWithdrawing(true)
     try {
       await withdrawApplication(application._id)
+      setShowWithdrawModal(false)
       onWithdraw(application._id)
     } catch (err) {
       console.error('Withdraw error:', err)
@@ -44,6 +50,7 @@ const ApplicationCard = ({ application, onWithdraw }) => {
   }
 
   return (
+    <>
     <div className="app-card">
       <div className="app-card-main">
         <div className="app-company-logo">
@@ -104,6 +111,17 @@ const ApplicationCard = ({ application, onWithdraw }) => {
         )}
       </div>
     </div>
+
+    <ConfirmModal
+      isOpen={showWithdrawModal}
+      title="Withdraw this application?"
+      message="Your application will be removed and the recruiter will no longer see it."
+      confirmLabel="Withdraw"
+      loading={withdrawing}
+      onConfirm={confirmWithdraw}
+      onCancel={() => setShowWithdrawModal(false)}
+    />
+  </>
   )
 }
 

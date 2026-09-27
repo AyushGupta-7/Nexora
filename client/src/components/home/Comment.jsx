@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '../../context/AuthContext'
 import Reply from './Reply'
+import ConfirmModal from '../common/ConfirmModal'
 import { likeComment, unlikeComment, addReply, deleteReply } from '../../services/postService'
 
 const Comment = ({ comment, postId, postAuthorId, onCommentUpdated, onDeleteComment }) => {
@@ -13,6 +14,8 @@ const Comment = ({ comment, postId, postAuthorId, onCommentUpdated, onDeleteComm
   const [replyText, setReplyText] = useState('')
   const [replies, setReplies] = useState(comment.replies || [])
   const [loading, setLoading] = useState(false)
+  const [deleteReplyId, setDeleteReplyId] = useState(null)
+  const [deleteReplyLoading, setDeleteReplyLoading] = useState(false)
 
   const commentAuthor = comment.author || {}
   const commentAuthorName = commentAuthor.fullName || 'Unknown User'
@@ -74,18 +77,26 @@ const Comment = ({ comment, postId, postAuthorId, onCommentUpdated, onDeleteComm
     }
   }
 
-  const handleDeleteReply = async (replyId) => {
-    if (!window.confirm('Delete this reply?')) return
+  const handleDeleteReply = (replyId) => {
+    setDeleteReplyId(replyId)
+  }
+
+  const confirmDeleteReply = async () => {
+    setDeleteReplyLoading(true)
     try {
-      await deleteReply(postId, comment._id, replyId)
-      setReplies(prev => prev.filter(r => r._id !== replyId))
+      await deleteReply(postId, comment._id, deleteReplyId)
+      setReplies(prev => prev.filter(r => r._id !== deleteReplyId))
+      setDeleteReplyId(null)
       if (onCommentUpdated) onCommentUpdated()
     } catch (error) {
       console.error('Delete reply error:', error)
+    } finally {
+      setDeleteReplyLoading(false)
     }
   }
 
   return (
+    <>
     <div className="comment-item">
       <div className="comment-avatar-small">
         <img src={commentAuthorAvatar} alt={commentAuthorName} />
@@ -177,6 +188,17 @@ const Comment = ({ comment, postId, postAuthorId, onCommentUpdated, onDeleteComm
         )}
       </div>
     </div>
+
+    <ConfirmModal
+      isOpen={!!deleteReplyId}
+      title="Delete this reply?"
+      message="The reply will be permanently removed."
+      confirmLabel="Delete"
+      loading={deleteReplyLoading}
+      onConfirm={confirmDeleteReply}
+      onCancel={() => setDeleteReplyId(null)}
+    />
+  </>
   )
 }
 
