@@ -25,12 +25,24 @@ const server = http.createServer(app)
 
 // Socket.IO setup
 const allowedOrigin = (origin, callback) => {
-  // Allow all localhost origins (any port) and requests with no origin (e.g. mobile apps, curl)
-  if (!origin || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-    return callback(null, true)
+  // Allow requests with no origin (curl, mobile apps, etc.)
+  if (!origin) {
+    return callback(null, true);
   }
-  callback(new Error('Not allowed by CORS'))
-}
+
+  // Allow localhost during development
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+    return callback(null, true);
+  }
+
+  // Allow deployed frontend
+  if (origin === "https://YOUR-FRONTEND.vercel.app") {
+    return callback(null, true);
+  }
+
+  console.log("Blocked CORS origin:", origin);
+  callback(new Error("Not allowed by CORS"));
+};
 
 const io = new Server(server, {
   cors: {
