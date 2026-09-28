@@ -90,7 +90,7 @@
   margin-top: 4px;
 }
 
-/* Groups Widget */
+/* Groups Widget (reused for Top Connects) */
 .groups-widget {
   background: var(--color-surface-container);
   border: 1px solid var(--color-outline-variant);
@@ -107,69 +107,133 @@
   letter-spacing: 0.05em;
   color: var(--color-on-surface-variant);
   text-transform: uppercase;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
-.groups-list {
+/* ── Top Connects ─────────────────────────────────────── */
+.top-connects-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
-.group-item {
+.top-connect-card {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.2s ease;
+  padding: 10px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s, border-color 0.18s;
+  border: 1px solid transparent;
 }
 
-.group-item:hover {
-  background: var(--color-surface-variant);
+.top-connect-card:hover {
+  background: var(--color-surface-variant, rgba(255,255,255,0.04));
+  border-color: var(--color-outline-variant);
+  transform: translateY(-1px);
 }
 
-.group-item:hover .group-name {
-  color: var(--color-secondary);
-}
-
-.group-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  background: #112240;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(58, 74, 74, 0.3);
+.top-connect-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  border: 2px solid var(--color-outline-variant);
+  transition: border-color 0.18s;
 }
 
-.group-item:hover .group-icon {
-  background: var(--color-secondary);
+.top-connect-card:hover .top-connect-avatar {
+  border-color: var(--color-secondary, #00dce3);
 }
 
-.group-item:hover .group-icon .material-symbols-outlined {
-  color: #112240;
+.top-connect-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.group-icon .material-symbols-outlined {
-  font-size: 18px;
-  color: var(--color-secondary);
-  transition: all 0.2s ease;
+.top-connect-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.group-name {
+.top-connect-name {
   font-size: 14px;
+  font-weight: 600;
   color: var(--color-on-surface);
-  transition: color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.18s;
 }
 
+.top-connect-card:hover .top-connect-name {
+  color: var(--color-secondary, #00dce3);
+}
+
+.top-connect-title {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-connect-arrow {
+  font-size: 18px;
+  color: var(--color-outline-variant);
+  flex-shrink: 0;
+  transition: color 0.18s, transform 0.15s;
+}
+
+.top-connect-card:hover .top-connect-arrow {
+  color: var(--color-secondary, #00dce3);
+  transform: translateX(2px);
+}
+
+/* Loading skeletons */
+.top-connects-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.top-connect-skeleton {
+  height: 54px;
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-variant, #1a2a3a) 25%,
+    var(--color-surface-container-high, #1e2f3f) 50%,
+    var(--color-surface-variant, #1a2a3a) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Empty state */
+.top-connects-empty {
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
+  padding: 4px 0 8px;
+}
+
+/* View All button */
 .view-all-btn {
   width: 100%;
-  margin-top: 16px;
+  margin-top: 14px;
   padding: 8px;
   background: transparent;
   border: 1px solid var(--color-outline-variant);
@@ -187,4 +251,4 @@
   color: var(--color-secondary);
   border-color: var(--color-secondary);
   background: rgba(65, 228, 192, 0.05);
-}
+}

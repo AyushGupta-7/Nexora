@@ -1,3 +1,11 @@
+// ── Dev-only: bypass TLS cert verification for local Windows dev environment ──
+// Cloudinary's HTTPS connection fails with SELF_SIGNED_CERT_IN_CHAIN on this
+// machine due to a local TLS inspection proxy (antivirus/corporate).
+// Remove process.env.NODE_TLS_REJECT_UNAUTHORIZED in production.
+if (process.env.NODE_ENV !== 'production') {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+}
+
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')

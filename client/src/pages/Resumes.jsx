@@ -18,6 +18,60 @@ const Resumes = () => {
   const [renameValue, setRenameValue] = useState('')
   const [deleteResumeId, setDeleteResumeId] = useState(null)
   const [deleteResumeLoading, setDeleteResumeLoading] = useState(false)
+  const [viewingId, setViewingId] = useState(null)      // resume._id being viewed/downloaded
+  const [downloadingId, setDownloadingId] = useState(null)
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
+  // Fetch the PDF through the authenticated backend proxy, return a blob URL
+  const fetchPdfBlob = async (resumeId, action) => {
+    const token = localStorage.getItem('token')
+    const resp = await fetch(`${API_URL}/resumes/${resumeId}/${action}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      credentials: 'include',
+    })
+    if (!resp.ok) throw new Error(`Server returned ${resp.status}`)
+    const blob = await resp.blob()
+    return URL.createObjectURL(blob)
+  }
+
+  // Opens PDF inline in a new browser tab — no download
+  const handleViewResume = async (resume) => {
+    if (viewingId === resume._id) return   // already loading
+    setViewingId(resume._id)
+    try {
+      const blobUrl = await fetchPdfBlob(resume._id, 'view')
+      window.open(blobUrl, '_blank', 'noopener,noreferrer')
+      // Revoke after a short delay — browser has already opened it by then
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000)
+    } catch (err) {
+      console.error('View resume error:', err)
+      alert('Could not open the PDF. Please try again.')
+    } finally {
+      setViewingId(null)
+    }
+  }
+
+  // Forces the browser to download the PDF with a proper filename
+  const handleDownloadResume = async (resume) => {
+    if (downloadingId === resume._id) return   // already downloading
+    setDownloadingId(resume._id)
+    try {
+      const blobUrl = await fetchPdfBlob(resume._id, 'download')
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = `${resume.name || 'Resume'}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000)
+    } catch (err) {
+      console.error('Download resume error:', err)
+      alert('Could not download the PDF. Please try again.')
+    } finally {
+      setDownloadingId(null)
+    }
+  }
 
   useEffect(() => {
     loadResumes()
@@ -201,15 +255,28 @@ const Resumes = () => {
                   </div>
                 </div>
                 <div className="resume-card-actions">
-                  <a
-                    href={resume.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  {/* View — opens PDF inline in browser, no download */}
+                  <button
                     className="resume-icon-btn"
-                    title="View PDF"
+                    title={viewingId === resume._id ? 'Opening…' : 'View PDF'}
+                    onClick={() => handleViewResume(resume)}
+                    disabled={viewingId === resume._id || downloadingId === resume._id}
                   >
-                    <span className="material-symbols-outlined">open_in_new</span>
-                  </a>
+                    <span className="material-symbols-outlined">
+                      {viewingId === resume._id ? 'hourglass_top' : 'visibility'}
+                    </span>
+                  </button>
+                  {/* Download — forces PDF file download with correct name */}
+                  <button
+                    className="resume-icon-btn"
+                    title={downloadingId === resume._id ? 'Downloading…' : 'Download PDF'}
+                    onClick={() => handleDownloadResume(resume)}
+                    disabled={viewingId === resume._id || downloadingId === resume._id}
+                  >
+                    <span className="material-symbols-outlined">
+                      {downloadingId === resume._id ? 'hourglass_top' : 'download'}
+                    </span>
+                  </button>
                   <button
                     className="resume-icon-btn"
                     title="Rename"

@@ -117,7 +117,17 @@ const getConnections = async (req, res) => {
       .populate('sender', 'fullName title location avatar about skills')
       .populate('recipient', 'fullName title location avatar about skills')
 
-    const connectedUsers = connections.map(conn => {
+    // Filter out stale connections where the referenced user was deleted
+    // (populate() sets the field to null when the User document no longer exists)
+    const validConnections = connections.filter(conn => conn.sender != null && conn.recipient != null)
+
+    if (validConnections.length < connections.length) {
+      console.warn(
+        `getConnections: skipped ${connections.length - validConnections.length} stale connection(s) with missing user references`
+      )
+    }
+
+    const connectedUsers = validConnections.map(conn => {
       const isRequester = conn.sender._id.toString() === req.user._id.toString()
       return {
         connectionId: conn._id,
