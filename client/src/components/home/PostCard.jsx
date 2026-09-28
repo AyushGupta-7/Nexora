@@ -256,20 +256,40 @@ const PostCard = ({ post, onPostUpdated }) => {
 
       {/* Media — supports both legacy string format and current {url,publicId,type} object format */}
       {post.media && post.media.length > 0 && (() => {
-        const mediaItem = post.media[0]
-        // Backward-compatible: old posts store strings, new posts store objects
-        const mediaUrl = typeof mediaItem === 'string' ? mediaItem : mediaItem?.url
-        return mediaUrl ? (
-          <div className="post-media">
-            <div className="post-media-frame">
-              <img
-                src={mediaUrl}
-                alt="Post image"
-                onError={(e) => { e.target.parentElement.parentElement.style.display = 'none' }}
-              />
+        if (post.media.length === 1) {
+          const mediaItem = post.media[0]
+          const mediaUrl = typeof mediaItem === 'string' ? mediaItem : mediaItem?.url
+          return mediaUrl ? (
+            <div className="post-media">
+              <div className="post-media-frame">
+                <img
+                  src={mediaUrl}
+                  alt="Post image"
+                  onError={(e) => { e.target.parentElement.parentElement.style.display = 'none' }}
+                />
+              </div>
             </div>
-          </div>
-        ) : null
+          ) : null
+        } else {
+          // Multiple images gallery
+          return (
+            <div className={`post-media-gallery gallery-${Math.min(post.media.length, 5)}`}>
+              {post.media.slice(0, 5).map((mediaItem, index) => {
+                const mediaUrl = typeof mediaItem === 'string' ? mediaItem : mediaItem?.url
+                if (!mediaUrl) return null
+                return (
+                  <div key={index} className="gallery-item">
+                    <img
+                      src={mediaUrl}
+                      alt={`Post image ${index + 1}`}
+                      onError={(e) => { e.target.parentElement.style.display = 'none' }}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          )
+        }
       })()}
 
 

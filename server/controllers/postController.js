@@ -98,7 +98,7 @@ const getPost = async (req, res) => {
   }
 }
 
-// @desc    Create post (with optional image)
+// @desc    Create post (with optional images)
 // @route   POST /api/posts
 // @access  Private
 const createPost = async (req, res) => {
@@ -106,20 +106,29 @@ const createPost = async (req, res) => {
     const { content, tags } = req.body
     const trimmedContent = content?.trim() || ''
 
-    if (!trimmedContent && !req.file) {
+    if (!trimmedContent && (!req.files || req.files.length === 0)) {
       return res.status(400).json({
         success: false,
         message: 'Please provide text or an image for the post',
       })
     }
 
+    if (req.files && req.files.length > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum 5 images allowed per post',
+      })
+    }
+
     // Handle image upload
     const mediaArray = []
-    if (req.file) {
-      mediaArray.push({
-        url: req.file.path,
-        publicId: req.file.filename || '',
-        type: 'image',
+    if (req.files && req.files.length > 0) {
+      req.files.forEach((file) => {
+        mediaArray.push({
+          url: file.path,
+          publicId: file.filename || '',
+          type: 'image',
+        })
       })
     }
 

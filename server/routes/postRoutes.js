@@ -21,7 +21,7 @@ const {
 // Post CRUD
 router.route('/')
   .get(protect, getPosts)
-  .post(protect, postUpload.single('image'), createPost)
+  .post(protect, postUpload.array('images', 5), createPost)
 
 router.route('/:id')
   .get(protect, getPost)

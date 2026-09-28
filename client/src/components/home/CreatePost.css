@@ -119,31 +119,37 @@
 
 .post-submit-btn.loading { opacity: 0.7; }
 
-/* Image Preview */
-.create-post-image-preview {
-  position: relative;
+/* Multiple Image Previews */
+.create-post-images-preview {
   margin: 12px 0 0 56px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.create-post-image-item {
+  position: relative;
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--color-outline-variant);
-  max-height: 300px;
+  aspect-ratio: 1; /* keep previews square */
 }
 
-.create-post-image-preview img {
+.create-post-image-item img {
   width: 100%;
-  max-height: 300px;
+  height: 100%;
   object-fit: cover;
   display: block;
 }
 
 .remove-image-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   border: none;
   color: white;
   cursor: pointer;
@@ -153,5 +159,6 @@
   transition: background 0.15s;
 }
 
-.remove-image-btn:hover { background: rgba(0, 0, 0, 0.85); }
-.remove-image-btn .material-symbols-outlined { font-size: 16px; }
+.remove-image-btn:hover { background: rgba(0, 0, 0, 0.9); }
+.remove-image-btn .material-symbols-outlined { font-size: 14px; }
+
