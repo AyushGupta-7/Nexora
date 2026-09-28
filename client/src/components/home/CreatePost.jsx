@@ -52,7 +52,9 @@ const CreatePost = ({ onPostCreated }) => {
 
     try {
       const formData = new FormData()
-      formData.append('content', content.trim() || ' ')
+      if (content.trim()) {
+        formData.append('content', content.trim())
+      }
       if (selectedImage) {
         formData.append('image', selectedImage)
       }

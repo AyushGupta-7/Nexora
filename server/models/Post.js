@@ -53,12 +53,14 @@ const postSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: [true, 'Post content is required'],
     trim: true,
     maxlength: [5000, 'Post cannot exceed 5000 characters'],
+    // Not required at schema level — controller validates content-or-media
   },
   media: [{
-    type: String,
+    url: { type: String, default: '' },
+    publicId: { type: String, default: '' },
+    type: { type: String, default: 'image' },
   }],
   tags: [{
     type: String,

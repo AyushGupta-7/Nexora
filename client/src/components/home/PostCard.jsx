@@ -254,19 +254,20 @@ const PostCard = ({ post, onPostUpdated }) => {
         )}
       </div>
 
-      {/* Media */}
+      {/* Media — supports both legacy string format and current {url,publicId,type} object format */}
       {post.media && post.media.length > 0 && (() => {
         const mediaItem = post.media[0]
+        // Backward-compatible: old posts store strings, new posts store objects
         const mediaUrl = typeof mediaItem === 'string' ? mediaItem : mediaItem?.url
         return mediaUrl ? (
           <div className="post-media">
-            <a href={mediaUrl} target="_blank" rel="noopener noreferrer">
+            <div className="post-media-frame">
               <img
                 src={mediaUrl}
-                alt="Post media"
-                onError={(e) => { e.target.style.display = 'none' }}
+                alt="Post image"
+                onError={(e) => { e.target.parentElement.parentElement.style.display = 'none' }}
               />
-            </a>
+            </div>
           </div>
         ) : null
       })()}

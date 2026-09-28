@@ -104,8 +104,9 @@ const getPost = async (req, res) => {
 const createPost = async (req, res) => {
   try {
     const { content, tags } = req.body
+    const trimmedContent = content?.trim() || ''
 
-    if (!content?.trim() && !req.file) {
+    if (!trimmedContent && !req.file) {
       return res.status(400).json({
         success: false,
         message: 'Please provide text or an image for the post',
@@ -122,12 +123,18 @@ const createPost = async (req, res) => {
       })
     }
 
-    const post = await Post.create({
+    const postData = {
       author: req.user._id,
-      content: content.trim(),
       media: mediaArray,
       tags: tags ? (Array.isArray(tags) ? tags : [tags]) : [],
-    })
+    }
+
+    // Only set content if non-empty (schema has no required constraint)
+    if (trimmedContent) {
+      postData.content = trimmedContent
+    }
+
+    const post = await Post.create(postData)
 
     const populatedPost = await Post.findById(post._id)
       .populate('author', 'fullName email avatar title')
