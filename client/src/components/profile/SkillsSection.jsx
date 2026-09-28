@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
+import ConfirmModal from '../common/ConfirmModal'
 import './SkillsSection.css'
 
 const SkillsSection = ({ profile, onUpdate }) => {
   const [isAdding, setIsAdding] = useState(false)
   const [newSkill, setNewSkill] = useState('')
   const [skills, setSkills] = useState(profile?.skills || [])
+  const [deleteIndex, setDeleteIndex] = useState(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const handleAddSkill = async () => {
     if (!newSkill.trim()) return
@@ -17,13 +20,18 @@ const SkillsSection = ({ profile, onUpdate }) => {
     }
   }
 
-  const handleRemoveSkill = async (index) => {
-    const updatedSkills = skills.filter((_, i) => i !== index)
+  const confirmRemoveSkill = async () => {
+    setDeleteLoading(true)
+    const updatedSkills = skills.filter((_, i) => i !== deleteIndex)
     const result = await onUpdate({ skills: updatedSkills })
     if (result.success) {
       setSkills(updatedSkills)
+      setDeleteIndex(null)
     }
+    setDeleteLoading(false)
   }
+
+  const deletingSkillName = deleteIndex !== null ? skills[deleteIndex]?.name : ''
 
   return (
     <section className="skills-section">
@@ -31,7 +39,7 @@ const SkillsSection = ({ profile, onUpdate }) => {
         <h2 className="skills-title">Skills</h2>
         <div className="skills-header-actions">
           <button className="skills-quiz-btn">Take skill quiz</button>
-          <button 
+          <button
             className="skills-add-btn"
             onClick={() => setIsAdding(!isAdding)}
           >
@@ -45,7 +53,7 @@ const SkillsSection = ({ profile, onUpdate }) => {
 
       <div className="skills-list">
         {skills.map((skill, index) => (
-          <div key={index} className="skill-item">
+          <div key={skill._id || skill.id || index} className="skill-item">
             <div className="skill-info">
               <span className="skill-name">{skill.name}</span>
               <div className="skill-endorsements">
@@ -55,11 +63,12 @@ const SkillsSection = ({ profile, onUpdate }) => {
                 <span>Endorsed by {skill.endorsements || 0} colleagues</span>
               </div>
             </div>
-            <button 
+            <button
               className="skill-remove-btn"
-              onClick={() => handleRemoveSkill(index)}
+              onClick={() => setDeleteIndex(index)}
+              title={`Delete ${skill.name}`}
             >
-              <span className="material-symbols-outlined">close</span>
+              <span className="material-symbols-outlined">delete</span>
             </button>
           </div>
         ))}
@@ -94,6 +103,16 @@ const SkillsSection = ({ profile, onUpdate }) => {
           </button>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={deleteIndex !== null}
+        title="Delete Skill?"
+        message={`Are you sure you want to remove "${deletingSkillName}" from your skills?`}
+        confirmLabel="Delete"
+        loading={deleteLoading}
+        onConfirm={confirmRemoveSkill}
+        onCancel={() => setDeleteIndex(null)}
+      />
     </section>
   )
 }

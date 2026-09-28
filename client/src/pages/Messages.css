@@ -224,6 +224,7 @@
   align-items: flex-end;
   gap: 8px;
   max-width: 75%;
+  position: relative;
 }
 
 .msg-row.self { align-self: flex-end; flex-direction: row-reverse; }
@@ -589,27 +590,263 @@
 
 .chat-image-remove .material-symbols-outlined { font-size: 14px; }
 
-/* Image message bubble */
-.msg-bubble-image {
-  padding: 4px;
-  background: transparent !important;
-  border: none !important;
-}
 
-.msg-image {
-  max-width: 240px;
-  max-height: 240px;
-  border-radius: 14px;
-  object-fit: cover;
-  display: block;
-  cursor: pointer;
+/* Action wrapper sits beside the bubble, outside msg-bubble-wrapper */
+.msg-action-wrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 4px;
+  flex-shrink: 0;
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.15s;
 }
 
-.msg-image:hover { opacity: 0.9; }
+/* Show on row hover OR when menu is open */
+.msg-row:hover .msg-action-wrapper,
+.msg-action-wrapper:has(.msg-action-btn.active),
+.msg-action-wrapper:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
 
-/* State center inside chat-messages */
-.chat-messages .messages-state-center {
+/* For browsers without :has — fallback via JS-added class */
+.msg-action-wrapper.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Place action button to the LEFT of self messages (row-reverse) */
+.msg-row.self .msg-action-wrapper {
+  order: -1;
+  justify-content: flex-end;
+}
+
+/* Place action button to the RIGHT of other messages */
+.msg-row.other .msg-action-wrapper {
+  order: 1;
+}
+
+/* The chevron button itself */
+.msg-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-surface-container-high);
+  border: 1px solid var(--color-outline-variant);
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.msg-action-btn:hover,
+.msg-action-btn.active {
+  background: var(--color-surface-container-highest, #2a3a4a);
+  color: var(--color-secondary, #00dce3);
+  border-color: var(--color-secondary, #00dce3);
+}
+
+.msg-action-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* Dropdown */
+.msg-action-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 200;
+  background: var(--color-surface-container-high, #1a2a3a);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 10px;
+  padding: 4px 0;
+  min-width: 140px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  animation: fadeInDown 0.12s ease;
+}
+
+/* Self messages: dropdown opens to the right of button */
+.msg-row.self .msg-action-menu {
+  left: auto;
+  right: 0;
+}
+
+/* Other messages: dropdown opens to the left of button */
+.msg-action-menu-other {
+  left: 0;
+  right: auto;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg-action-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  color: var(--color-on-surface);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.msg-action-item:hover {
+  background: var(--color-surface-container-highest, rgba(255,255,255,0.06));
+}
+
+.msg-action-item .material-symbols-outlined {
+  font-size: 17px;
+  color: var(--color-on-surface-variant);
+  flex-shrink: 0;
+}
+
+.msg-action-danger {
+  color: var(--color-error, #f87171) !important;
+}
+
+.msg-action-danger .material-symbols-outlined {
+  color: var(--color-error, #f87171) !important;
+}
+
+/* ── Reply bar ─────────────────────────────────────────────────── */
+.chat-reply-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--color-surface-container);
+  border-top: 1px solid var(--color-outline-variant);
+  border-left: 3px solid var(--color-secondary, #00dce3);
+}
+
+.chat-reply-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   flex: 1;
-  min-height: 200px;
+  min-width: 0;
+}
+
+.chat-reply-icon {
+  font-size: 16px !important;
+  color: var(--color-secondary, #00dce3);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.chat-reply-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-secondary, #00dce3);
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.chat-reply-preview {
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.chat-reply-close {
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.chat-reply-close:hover { color: var(--color-on-surface); }
+.chat-reply-close .material-symbols-outlined { font-size: 18px; }
+
+/* ── Image sending state ──────────────────────────────────────── */
+.msg-image-sending {
+  width: 180px;
+  height: 120px;
+  border-radius: 14px;
+  background: var(--color-surface-container-high, #1e2f3f);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msg-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-on-surface-variant);
+}
+
+.msg-image-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid var(--color-outline-variant);
+  border-top-color: var(--color-secondary, #00dce3);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.msg-image-sending-label { font-size: 12px; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Send error banner ────────────────────────────────────────── */
+.chat-send-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: color-mix(in srgb, var(--color-error, #f87171) 10%, var(--color-surface-container));
+  border-top: 1px solid color-mix(in srgb, var(--color-error, #f87171) 25%, transparent);
+  color: var(--color-error, #f87171);
+  font-size: 13px;
+}
+
+.chat-send-error .material-symbols-outlined { font-size: 17px; }
+
+.chat-send-error button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.chat-send-error button:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+/* ── Image error in bubble ────────────────────────────────────── */
+.msg-image-error {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  padding: 8px 12px;
+  display: block;
 }

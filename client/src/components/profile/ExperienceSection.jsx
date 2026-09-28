@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
+import ConfirmModal from '../common/ConfirmModal'
 import './ExperienceSection.css'
 
 const ExperienceSection = ({ profile, onUpdate }) => {
   const [isAdding, setIsAdding] = useState(false)
   const [experiences, setExperiences] = useState(profile?.experiences || [])
+  const [deleteTarget, setDeleteTarget] = useState(null) // the exp object to delete
+  const [deleteLoading, setDeleteLoading] = useState(false)
   const [formData, setFormData] = useState({
     company: '',
     position: '',
@@ -25,7 +28,7 @@ const ExperienceSection = ({ profile, onUpdate }) => {
 
   const handleSubmit = async () => {
     if (!formData.company || !formData.position) return
-    
+
     const updatedExperiences = [...experiences, { ...formData, id: Date.now() }]
     const result = await onUpdate({ experiences: updatedExperiences })
     if (result.success) {
@@ -44,13 +47,17 @@ const ExperienceSection = ({ profile, onUpdate }) => {
     }
   }
 
-  const handleRemove = async (exp) => {
-    const expKey = exp._id || exp.id
+  const confirmRemove = async () => {
+    if (!deleteTarget) return
+    setDeleteLoading(true)
+    const expKey = deleteTarget._id || deleteTarget.id
     const updatedExperiences = experiences.filter(e => (e._id || e.id) !== expKey)
     const result = await onUpdate({ experiences: updatedExperiences })
     if (result.success) {
       setExperiences(updatedExperiences)
+      setDeleteTarget(null)
     }
+    setDeleteLoading(false)
   }
 
   return (
@@ -58,7 +65,7 @@ const ExperienceSection = ({ profile, onUpdate }) => {
       <div className="experience-header">
         <h2 className="experience-title">Experience</h2>
         <div className="experience-header-actions">
-          <button 
+          <button
             className="experience-add-btn"
             onClick={() => setIsAdding(!isAdding)}
           >
@@ -103,11 +110,12 @@ const ExperienceSection = ({ profile, onUpdate }) => {
                     </ul>
                   )}
                 </div>
-                <button 
+                <button
                   className="experience-item-remove"
-                  onClick={() => handleRemove(exp.id)}
+                  onClick={() => setDeleteTarget(exp)}
+                  title="Delete experience"
                 >
-                  <span className="material-symbols-outlined">close</span>
+                  <span className="material-symbols-outlined">delete</span>
                 </button>
               </div>
             </div>
@@ -181,8 +189,8 @@ const ExperienceSection = ({ profile, onUpdate }) => {
             <button className="experience-add-cancel" onClick={() => setIsAdding(false)}>
               Cancel
             </button>
-            <button 
-              className="experience-add-submit" 
+            <button
+              className="experience-add-submit"
               onClick={handleSubmit}
               disabled={!formData.company || !formData.position}
             >
@@ -191,6 +199,18 @@ const ExperienceSection = ({ profile, onUpdate }) => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Experience?"
+        message={deleteTarget
+          ? `Are you sure you want to remove "${deleteTarget.position} at ${deleteTarget.company}"?`
+          : ''}
+        confirmLabel="Delete"
+        loading={deleteLoading}
+        onConfirm={confirmRemove}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </section>
   )
 }

@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSocket } from '../context/SocketContext'
 import Navbar from '../components/layout/Navbar'
+import ConfirmModal from '../components/common/ConfirmModal'
 import {
   getConversations,
   getMessages,
   sendMessage,
   sendMediaMessage,
+  deleteMessage as deleteMessageApi,
 } from '../services/messageService'
 import { format, isToday, isYesterday } from 'date-fns'
 import './Messages.css'
@@ -22,7 +24,7 @@ const fmtTime = (date) => {
   } catch { return '' }
 }
 
-const avatar = (name, src) =>
+const avatarUrl = (name, src) =>
   src || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'U')}&background=00dce3&color=041329`
 
 /* ─── Conversation sidebar item ───────────────────────────────────── */
@@ -42,7 +44,7 @@ const ConversationItem = ({ conversation, currentUserId, activeConvId, onClick }
   return (
     <div className={`convo-item ${isActive ? 'active' : ''}`} onClick={() => onClick(conversation)}>
       <div className="convo-avatar-wrapper">
-        <img src={avatar(other.fullName, other.avatar)} alt={other.fullName || 'User'} className="convo-avatar" />
+        <img src={avatarUrl(other.fullName, other.avatar)} alt={other.fullName || 'User'} className="convo-avatar" />
         {isOnline && <span className="convo-online-dot" />}
       </div>
       <div className="convo-info">
@@ -56,29 +58,60 @@ const ConversationItem = ({ conversation, currentUserId, activeConvId, onClick }
   )
 }
 
-/* ─── Individual message bubble ───────────────────────────────────── */
-const MessageBubble = ({ message, currentUserId }) => {
+/* ─── Individual message bubble with action menu ─────────────────── */
+const MessageBubble = ({ message, currentUserId, onReply, onDelete }) => {
   const isSelf   = (message.sender?._id || message.sender)?.toString() === currentUserId
   const sender   = message.sender || {}
   const side     = isSelf ? 'self' : 'other'
-  const isTemp   = message.isTemp === true
   const isSending = message.isSending === true
 
-  // A message is an image if messageType==='image' AND media.url exists
   const mediaUrl  = message.messageType === 'image' ? message.media?.url : null
   const hasText   = message.content?.trim()
 
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [copyDone, setCopyDone] = useState(false)
+  const menuRef = useRef(null)
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [menuOpen])
+
+  const handleCopy = async () => {
+    setMenuOpen(false)
+    if (!hasText) return
+    try {
+      await navigator.clipboard.writeText(message.content)
+      setCopyDone(true)
+      setTimeout(() => setCopyDone(false), 2000)
+    } catch { /* silently ignore */ }
+  }
+
+  const handleReply = () => {
+    setMenuOpen(false)
+    onReply?.(message)
+  }
+
+  const handleDelete = () => {
+    setMenuOpen(false)
+    onDelete?.(message)
+  }
+
   return (
-    <div className={`msg-row ${side} ${isTemp ? 'msg-temp' : ''}`}>
+    <div className={`msg-row ${side} ${isSending ? 'msg-temp' : ''}`}>
       {!isSelf && (
-        <img src={avatar(sender.fullName, sender.avatar)} alt={sender.fullName || 'U'} className="msg-avatar" />
+        <img src={avatarUrl(sender.fullName, sender.avatar)} alt={sender.fullName || 'U'} className="msg-avatar" />
       )}
       <div className="msg-bubble-wrapper">
         {/* Image */}
         {mediaUrl && (
           <div className={`msg-bubble ${side} msg-bubble-image`}>
             {isSending ? (
-              /* Show spinner overlay while uploading */
               <div className="msg-image-sending">
                 <div className="msg-image-placeholder">
                   <div className="msg-image-spinner" />
@@ -107,9 +140,68 @@ const MessageBubble = ({ message, currentUserId }) => {
           </div>
         )}
         <span className="msg-time">
-          {isSending ? 'Sending…' : fmtTime(message.createdAt)}
+          {copyDone ? '✓ Copied' : isSending ? 'Sending…' : fmtTime(message.createdAt)}
         </span>
       </div>
+
+      {/* Action button — only for own non-pending messages */}
+      {isSelf && !isSending && (
+        <div className="msg-action-wrapper" ref={menuRef}>
+          <button
+            className={`msg-action-btn ${menuOpen ? 'active' : ''}`}
+            onClick={() => setMenuOpen(o => !o)}
+            title="Message actions"
+          >
+            <span className="material-symbols-outlined">expand_more</span>
+          </button>
+
+          {menuOpen && (
+            <div className="msg-action-menu">
+              {hasText && (
+                <button className="msg-action-item" onClick={handleCopy}>
+                  <span className="material-symbols-outlined">content_copy</span>
+                  Copy
+                </button>
+              )}
+              <button className="msg-action-item" onClick={handleReply}>
+                <span className="material-symbols-outlined">reply</span>
+                Reply
+              </button>
+              <button className="msg-action-item msg-action-danger" onClick={handleDelete}>
+                <span className="material-symbols-outlined">delete</span>
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Reply action for OTHER's messages (reply only, no delete) */}
+      {!isSelf && !isSending && (
+        <div className="msg-action-wrapper msg-action-other" ref={menuRef}>
+          <button
+            className={`msg-action-btn ${menuOpen ? 'active' : ''}`}
+            onClick={() => setMenuOpen(o => !o)}
+            title="Message actions"
+          >
+            <span className="material-symbols-outlined">expand_more</span>
+          </button>
+          {menuOpen && (
+            <div className="msg-action-menu msg-action-menu-other">
+              {hasText && (
+                <button className="msg-action-item" onClick={handleCopy}>
+                  <span className="material-symbols-outlined">content_copy</span>
+                  Copy
+                </button>
+              )}
+              <button className="msg-action-item" onClick={handleReply}>
+                <span className="material-symbols-outlined">reply</span>
+                Reply
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -126,19 +218,25 @@ const Messages = () => {
   const [activeConv,       setActiveConv]       = useState(null)
   const [messages,         setMessages]         = useState([])
   const [messageInput,     setMessageInput]     = useState('')
-  const [selectedImage,    setSelectedImage]    = useState(null)   // File
-  const [imagePreview,     setImagePreview]     = useState(null)   // data: URL for preview strip only
+  const [selectedImage,    setSelectedImage]    = useState(null)
+  const [imagePreview,     setImagePreview]     = useState(null)
   const [loading,          setLoading]          = useState(true)
   const [messagesLoading,  setMessagesLoading]  = useState(false)
   const [sending,          setSending]          = useState(false)
   const [sendError,        setSendError]        = useState('')
   const [isTyping,         setIsTyping]         = useState(false)
 
+  // Reply state
+  const [replyTo,          setReplyTo]          = useState(null) // message object
+
+  // Delete modal state
+  const [deleteTarget,     setDeleteTarget]     = useState(null) // message object
+  const [deleteLoading,    setDeleteLoading]    = useState(false)
+
   const messagesEndRef   = useRef(null)
   const typingTimeoutRef = useRef(null)
   const imageInputRef    = useRef(null)
   const activeConvIdRef  = useRef(null)
-  // Guard against conversations-update re-triggering openConversation
   const openedByUrlRef   = useRef(false)
 
   /* ── Load conversations on mount ─────────────────────────────── */
@@ -147,7 +245,7 @@ const Messages = () => {
   /* ── Auto-open from URL param ────────────────────────────────── */
   useEffect(() => {
     if (!paramConvId || conversations.length === 0) return
-    if (openedByUrlRef.current) return          // already opened from URL
+    if (openedByUrlRef.current) return
     const conv = conversations.find(c => c._id === paramConvId)
     if (conv) {
       openedByUrlRef.current = true
@@ -169,28 +267,34 @@ const Messages = () => {
 
     const onReceive = (message) => {
       setMessages(prev => {
-        // Deduplicate by real _id
         if (prev.some(m => m._id === message._id)) return prev
         return [...prev, message]
       })
       scrollToBottom()
     }
+
+    const onDeleted = ({ messageId }) => {
+      setMessages(prev => prev.filter(m => m._id !== messageId))
+    }
+
     const onTypingStart = ({ userId }) => { if (userId !== currentUserId) setIsTyping(true) }
     const onTypingStop  = ({ userId }) => { if (userId !== currentUserId) setIsTyping(false) }
 
     socket.on('message:receive', onReceive)
+    socket.on('message:deleted', onDeleted)
     socket.on('typing:start',    onTypingStart)
     socket.on('typing:stop',     onTypingStop)
 
     return () => {
       socket.off('message:receive', onReceive)
+      socket.off('message:deleted', onDeleted)
       socket.off('typing:start',    onTypingStart)
       socket.off('typing:stop',     onTypingStop)
       socket.emit('conversation:leave', convId)
     }
   }, [socket, activeConv?._id, currentUserId])
 
-  /* ── Scroll to bottom when messages change ───────────────────── */
+  /* ── Scroll to bottom ────────────────────────────────────────── */
   useEffect(() => {
     if (messages.length > 0) scrollToBottom()
   }, [messages])
@@ -230,70 +334,54 @@ const Messages = () => {
     setMessages([])
     setIsTyping(false)
     setSendError('')
+    setReplyTo(null)
     navigate(`/messages/${conversation._id}`, { replace: true })
     await loadMessagesFor(conversation._id)
   }
 
-  /* ── Image picker ─────────────────────────────────────────────── */
+  /* ── Image picker ────────────────────────────────────────────── */
   const handleImageSelect = (e) => {
     const file = e.target.files[0]
     if (!file) return
-
-    if (!file.type.startsWith('image/')) {
-      setSendError('Only image files are allowed.')
-      return
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      setSendError('Image must be under 8 MB.')
-      return
-    }
+    if (!file.type.startsWith('image/')) { setSendError('Only image files are allowed.'); return }
+    if (file.size > 8 * 1024 * 1024)    { setSendError('Image must be under 8 MB.');    return }
     setSendError('')
     setSelectedImage(file)
-    // FileReader preview is ONLY for the preview strip — never stored in a message
     const reader = new FileReader()
     reader.onload = (ev) => setImagePreview(ev.target.result)
     reader.readAsDataURL(file)
     if (imageInputRef.current) imageInputRef.current.value = ''
   }
 
-  const handleRemoveImage = () => {
-    setSelectedImage(null)
-    setImagePreview(null)
-    setSendError('')
-  }
+  const handleRemoveImage = () => { setSelectedImage(null); setImagePreview(null); setSendError('') }
 
-  /* ── Send message ─────────────────────────────────────────────── */
+  /* ── Send message ────────────────────────────────────────────── */
   const handleSendMessage = async () => {
     if ((!messageInput.trim() && !selectedImage) || !activeConv || sending) return
 
     const content   = messageInput.trim()
     const imageFile = selectedImage
+    const replyRef  = replyTo
 
     setMessageInput('')
     setSelectedImage(null)
     setImagePreview(null)
+    setReplyTo(null)
     setSendError('')
     setSending(true)
 
-    /*
-     * Optimistic message for TEXT:  show immediately (text is local, safe).
-     * For IMAGE:                    show a "sending" placeholder (NO blob URL).
-     *   The Cloudinary URL arrives in the API response → replaces placeholder.
-     *   This guarantees the only URL ever stored/shown is the real Cloudinary URL.
-     */
     const tempId = `temp-${Date.now()}`
     const tempMessage = {
-      _id:         tempId,
+      _id:          tempId,
       conversation: activeConv._id,
-      sender:      { _id: currentUserId, fullName: user?.fullName, avatar: user?.avatar },
-      content:     content || null,
-      messageType: imageFile ? 'image' : 'text',
-      media:       imageFile
-        ? { url: imagePreview, type: 'image' } // data: URL — visible ONLY until replaced
-        : null,
-      createdAt:   new Date().toISOString(),
-      isTemp:      true,
-      isSending:   true,   // triggers "Uploading…" overlay in MessageBubble
+      sender:       { _id: currentUserId, fullName: user?.fullName, avatar: user?.avatar },
+      content:      content || null,
+      messageType:  imageFile ? 'image' : 'text',
+      media:        imageFile ? { url: imagePreview, type: 'image' } : null,
+      replyTo:      replyRef ? { _id: replyRef._id, content: replyRef.content, sender: replyRef.sender } : null,
+      createdAt:    new Date().toISOString(),
+      isTemp:       true,
+      isSending:    true,
     }
     setMessages(prev => [...prev, tempMessage])
 
@@ -306,20 +394,9 @@ const Messages = () => {
       }
 
       if (response?.success && response.message) {
-        /*
-         * Replace temp with real persisted message (contains Cloudinary URL).
-         * From this point the local data: URL is gone forever.
-         */
         const realMsg = { ...response.message, isTemp: false, isSending: false }
         setMessages(prev => prev.map(m => (m._id === tempId ? realMsg : m)))
-
-        // Emit to the other participant via Socket.IO
-        socket?.emit('message:send', {
-          conversationId: activeConv._id,
-          message: realMsg,
-        })
-
-        // Update sidebar last message (use functional update, no new object needed)
+        socket?.emit('message:send', { conversationId: activeConv._id, message: realMsg })
         setConversations(prev => prev.map(c =>
           c._id === activeConv._id
             ? { ...c, lastMessage: response.message, lastMessageAt: new Date() }
@@ -330,15 +407,31 @@ const Messages = () => {
       }
     } catch (err) {
       console.error('Send message error:', err)
-      // Remove the failed optimistic message
       setMessages(prev => prev.filter(m => m._id !== tempId))
-      // Restore content so user can retry
       if (content) setMessageInput(content)
-      setSendError(imageFile
-        ? 'Failed to send image. Please try again.'
-        : 'Failed to send message. Please try again.')
+      setSendError(imageFile ? 'Failed to send image. Please try again.' : 'Failed to send message. Please try again.')
     } finally {
       setSending(false)
+    }
+  }
+
+  /* ── Delete message ──────────────────────────────────────────── */
+  const confirmDeleteMessage = async () => {
+    if (!deleteTarget) return
+    setDeleteLoading(true)
+    try {
+      const res = await deleteMessageApi(deleteTarget._id)
+      if (res.success) {
+        setMessages(prev => prev.filter(m => m._id !== deleteTarget._id))
+        setDeleteTarget(null)
+      } else {
+        setSendError('Failed to delete message.')
+      }
+    } catch (err) {
+      console.error('Delete message error:', err)
+      setSendError('Failed to delete message.')
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -371,7 +464,7 @@ const Messages = () => {
       <main className="messages-main">
         <div className="messages-layout">
 
-          {/* ── Sidebar ─────────────────────────────────────────── */}
+          {/* ── Sidebar ──────────────────────────────────────────── */}
           <aside className="messages-sidebar">
             <div className="sidebar-header">
               <h2>Messages</h2>
@@ -418,6 +511,7 @@ const Messages = () => {
                       setActiveConv(null)
                       activeConvIdRef.current = null
                       openedByUrlRef.current = false
+                      setReplyTo(null)
                       navigate('/messages')
                     }}
                   >
@@ -426,7 +520,7 @@ const Messages = () => {
                   {otherParticipant && (
                     <>
                       <img
-                        src={avatar(otherParticipant.fullName, otherParticipant.avatar)}
+                        src={avatarUrl(otherParticipant.fullName, otherParticipant.avatar)}
                         alt={otherParticipant.fullName}
                         className="chat-header-avatar"
                       />
@@ -456,7 +550,13 @@ const Messages = () => {
                     </div>
                   ) : (
                     messages.map(msg => (
-                      <MessageBubble key={msg._id} message={msg} currentUserId={currentUserId} />
+                      <MessageBubble
+                        key={msg._id}
+                        message={msg}
+                        currentUserId={currentUserId}
+                        onReply={setReplyTo}
+                        onDelete={setDeleteTarget}
+                      />
                     ))
                   )}
                   {isTyping && (
@@ -467,7 +567,7 @@ const Messages = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Send error banner */}
+                {/* Send error */}
                 {sendError && (
                   <div className="chat-send-error">
                     <span className="material-symbols-outlined">error</span>
@@ -476,7 +576,25 @@ const Messages = () => {
                   </div>
                 )}
 
-                {/* Image preview strip */}
+                {/* Reply bar */}
+                {replyTo && (
+                  <div className="chat-reply-bar">
+                    <div className="chat-reply-content">
+                      <span className="material-symbols-outlined chat-reply-icon">reply</span>
+                      <div>
+                        <span className="chat-reply-label">Replying to</span>
+                        <p className="chat-reply-preview">
+                          {replyTo.messageType === 'image' ? '📷 Image' : (replyTo.content || '')}
+                        </p>
+                      </div>
+                    </div>
+                    <button className="chat-reply-close" onClick={() => setReplyTo(null)}>
+                      <span className="material-symbols-outlined">close</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Image preview */}
                 {imagePreview && (
                   <div className="chat-image-preview">
                     <img src={imagePreview} alt="Preview" />
@@ -486,7 +604,7 @@ const Messages = () => {
                   </div>
                 )}
 
-                {/* Input area */}
+                {/* Input */}
                 <div className="chat-input-area">
                   <button
                     className="chat-attach-btn"
@@ -505,7 +623,7 @@ const Messages = () => {
                   />
                   <textarea
                     className="chat-input"
-                    placeholder={selectedImage ? 'Add a caption…' : 'Type a message…'}
+                    placeholder={selectedImage ? 'Add a caption…' : replyTo ? 'Write a reply…' : 'Type a message…'}
                     value={messageInput}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
@@ -527,6 +645,17 @@ const Messages = () => {
           </div>
         </div>
       </main>
+
+      {/* Delete message confirmation */}
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete message?"
+        message="This message will be permanently removed for everyone."
+        confirmLabel="Delete"
+        loading={deleteLoading}
+        onConfirm={confirmDeleteMessage}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }

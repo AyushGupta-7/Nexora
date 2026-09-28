@@ -227,10 +227,49 @@ const sendMediaMessage = async (req, res) => {
   }
 }
 
+// @desc    Delete a message (own messages only)
+// @route   DELETE /api/messages/:messageId
+// @access  Private
+const deleteMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params
+
+    if (!isValidId(messageId)) {
+      return res.status(400).json({ success: false, message: 'Invalid message ID' })
+    }
+
+    const message = await Message.findById(messageId)
+    if (!message) {
+      return res.status(404).json({ success: false, message: 'Message not found' })
+    }
+
+    // Authorization: only the sender can delete their own message
+    if (message.sender.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Not authorized to delete this message' })
+    }
+
+    const conversationId = message.conversation.toString()
+
+    await Message.findByIdAndDelete(messageId)
+
+    // Emit real-time deletion event to the conversation room
+    const io = req.app.get('io')
+    if (io) {
+      io.to(conversationId).emit('message:deleted', { messageId, conversationId })
+    }
+
+    res.status(200).json({ success: true, messageId })
+  } catch (error) {
+    console.error('Delete message error:', error)
+    res.status(500).json({ success: false, message: 'Failed to delete message' })
+  }
+}
+
 module.exports = {
   getOrCreateConversation,
   getConversations,
   getMessages,
   sendMessage,
   sendMediaMessage,
+  deleteMessage,
 }

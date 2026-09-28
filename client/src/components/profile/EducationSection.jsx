@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
+import ConfirmModal from '../common/ConfirmModal'
 import './EducationSection.css'
 
 const EducationSection = ({ profile, onUpdate }) => {
   const [isAdding, setIsAdding] = useState(false)
   const [educations, setEducations] = useState(profile?.educations || [])
+  const [deleteTarget, setDeleteTarget] = useState(null) // the edu object
+  const [deleteLoading, setDeleteLoading] = useState(false)
   const [formData, setFormData] = useState({
     school: '',
     degree: '',
@@ -21,7 +24,7 @@ const EducationSection = ({ profile, onUpdate }) => {
 
   const handleSubmit = async () => {
     if (!formData.school || !formData.degree) return
-    
+
     const updatedEducations = [...educations, { ...formData, id: Date.now() }]
     const result = await onUpdate({ educations: updatedEducations })
     if (result.success) {
@@ -39,13 +42,17 @@ const EducationSection = ({ profile, onUpdate }) => {
     }
   }
 
-  const handleRemove = async (edu) => {
-    const eduKey = edu._id || edu.id
+  const confirmRemove = async () => {
+    if (!deleteTarget) return
+    setDeleteLoading(true)
+    const eduKey = deleteTarget._id || deleteTarget.id
     const updatedEducations = educations.filter(e => (e._id || e.id) !== eduKey)
     const result = await onUpdate({ educations: updatedEducations })
     if (result.success) {
       setEducations(updatedEducations)
+      setDeleteTarget(null)
     }
+    setDeleteLoading(false)
   }
 
   return (
@@ -53,7 +60,7 @@ const EducationSection = ({ profile, onUpdate }) => {
       <div className="education-header">
         <h2 className="education-title">Education</h2>
         <div className="education-header-actions">
-          <button 
+          <button
             className="education-add-btn"
             onClick={() => setIsAdding(!isAdding)}
           >
@@ -86,11 +93,12 @@ const EducationSection = ({ profile, onUpdate }) => {
                 </p>
               )}
             </div>
-            <button 
+            <button
               className="education-item-remove"
-              onClick={() => handleRemove(edu)}
+              onClick={() => setDeleteTarget(edu)}
+              title="Delete education"
             >
-              <span className="material-symbols-outlined">close</span>
+              <span className="material-symbols-outlined">delete</span>
             </button>
           </div>
         ))}
@@ -160,8 +168,8 @@ const EducationSection = ({ profile, onUpdate }) => {
             <button className="education-add-cancel" onClick={() => setIsAdding(false)}>
               Cancel
             </button>
-            <button 
-              className="education-add-submit" 
+            <button
+              className="education-add-submit"
               onClick={handleSubmit}
               disabled={!formData.school || !formData.degree}
             >
@@ -170,6 +178,18 @@ const EducationSection = ({ profile, onUpdate }) => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Education?"
+        message={deleteTarget
+          ? `Are you sure you want to remove "${deleteTarget.degree}${deleteTarget.field ? ` in ${deleteTarget.field}` : ''}" at ${deleteTarget.school}?`
+          : ''}
+        confirmLabel="Delete"
+        loading={deleteLoading}
+        onConfirm={confirmRemove}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </section>
   )
 }

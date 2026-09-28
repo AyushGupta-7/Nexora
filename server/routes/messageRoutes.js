@@ -8,6 +8,7 @@ const {
   getMessages,
   sendMessage,
   sendMediaMessage,
+  deleteMessage,
 } = require('../controllers/messageController')
 
 router.post('/conversation', protect, getOrCreateConversation)
@@ -15,5 +16,6 @@ router.get('/conversations', protect, getConversations)
 router.post('/media', protect, messageUpload.single('image'), sendMediaMessage)
 router.post('/', protect, sendMessage)
 router.get('/:conversationId', protect, getMessages)
+router.delete('/:messageId', protect, deleteMessage)
 
 module.exports = router

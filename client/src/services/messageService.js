@@ -34,3 +34,7 @@ export const sendMediaMessage = async (conversationId, content, imageFile) => {
   })
   return response.data
 }
+export const deleteMessage = async (messageId) => {
+  const response = await api.delete(`/messages/${messageId}`)
+  return response.data
+}
