@@ -25,7 +25,7 @@ const server = http.createServer(app)
 
 // Socket.IO setup
 const allowedOrigin = (origin, callback) => {
-  // Allow requests with no origin (curl, mobile apps, etc.)
+  // Allow requests with no origin
   if (!origin) {
     return callback(null, true);
   }
@@ -35,8 +35,8 @@ const allowedOrigin = (origin, callback) => {
     return callback(null, true);
   }
 
-  // Allow deployed frontend
-  if (origin === "https://YOUR-FRONTEND.vercel.app") {
+  // Allow production frontend
+  if (origin === "https://nexora-beta-rouge.vercel.app") {
     return callback(null, true);
   }
 
