@@ -42,6 +42,54 @@ const ApplicantRow = ({ application, jobId, onStageUpdate }) => {
   const user = application.user || {}
   const resume = application.resume || {}
   const statusStyle = STATUS_STYLES[selectedStage] || STATUS_STYLES['Applied']
+  const [viewingResume, setViewingResume] = useState(false)
+  const [downloadingResume, setDownloadingResume] = useState(false)
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
+  const fetchPdfBlob = async (resumeId, action) => {
+    const token = localStorage.getItem('token')
+    const resp = await fetch(`${API_URL}/resumes/${resumeId}/${action}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      credentials: 'include',
+    })
+    if (!resp.ok) throw new Error(`Server returned ${resp.status}`)
+    const blob = await resp.blob()
+    return URL.createObjectURL(blob)
+  }
+
+  const handleViewResume = async () => {
+    if (viewingResume || !resume._id) return
+    setViewingResume(true)
+    try {
+      const blobUrl = await fetchPdfBlob(resume._id, 'view')
+      window.open(blobUrl, '_blank', 'noopener,noreferrer')
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000)
+    } catch (err) {
+      console.error('View resume error:', err)
+    } finally {
+      setViewingResume(false)
+    }
+  }
+
+  const handleDownloadResume = async () => {
+    if (downloadingResume || !resume._id) return
+    setDownloadingResume(true)
+    try {
+      const blobUrl = await fetchPdfBlob(resume._id, 'download')
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = `${user.fullName || 'Applicant'}_Resume.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000)
+    } catch (err) {
+      console.error('Download resume error:', err)
+    } finally {
+      setDownloadingResume(false)
+    }
+  }
 
   const userAvatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || 'User')}&background=00dce3&color=041329`
 
@@ -71,10 +119,36 @@ const ApplicantRow = ({ application, jobId, onStageUpdate }) => {
       </div>
       <div className="applicant-resume">
         {resume.name ? (
-          <span className="applicant-resume-name">
-            <span className="material-symbols-outlined">description</span>
-            {resume.name}
-          </span>
+          <div className="applicant-resume-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="applicant-resume-name">
+              <span className="material-symbols-outlined">description</span>
+              {resume.name}
+            </span>
+            <div className="applicant-resume-actions" style={{ display: 'flex', gap: '4px' }}>
+              <button 
+                className="rec-btn-icon" 
+                onClick={handleViewResume}
+                disabled={viewingResume || downloadingResume}
+                title="View Resume"
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--color-on-surface-variant)' }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                  {viewingResume ? 'hourglass_top' : 'visibility'}
+                </span>
+              </button>
+              <button 
+                className="rec-btn-icon" 
+                onClick={handleDownloadResume}
+                disabled={viewingResume || downloadingResume}
+                title="Download Resume"
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--color-on-surface-variant)' }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                  {downloadingResume ? 'hourglass_top' : 'download'}
+                </span>
+              </button>
+            </div>
+          </div>
         ) : (
           <span className="applicant-no-resume">No resume</span>
         )}

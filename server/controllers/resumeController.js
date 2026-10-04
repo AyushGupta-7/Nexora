@@ -166,7 +166,14 @@ const viewResume = async (req, res) => {
   try {
     const resume = await Resume.findById(req.params.id)
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' })
-    if (resume.user.toString() !== req.user._id.toString()) {
+    let isAuthorized = resume.user.toString() === req.user._id.toString()
+    if (!isAuthorized && req.user.role === 'recruiter') {
+      const Application = require('../models/Application')
+      const applications = await Application.find({ resume: resume._id }).populate('job', 'postedBy')
+      isAuthorized = applications.some(app => app.job && app.job.postedBy.toString() === req.user._id.toString())
+    }
+
+    if (!isAuthorized) {
       return res.status(403).json({ success: false, message: 'Not authorized' })
     }
     proxyResume(res, resume.fileUrl, 'inline')
@@ -183,7 +190,14 @@ const downloadResume = async (req, res) => {
   try {
     const resume = await Resume.findById(req.params.id)
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' })
-    if (resume.user.toString() !== req.user._id.toString()) {
+    let isAuthorized = resume.user.toString() === req.user._id.toString()
+    if (!isAuthorized && req.user.role === 'recruiter') {
+      const Application = require('../models/Application')
+      const applications = await Application.find({ resume: resume._id }).populate('job', 'postedBy')
+      isAuthorized = applications.some(app => app.job && app.job.postedBy.toString() === req.user._id.toString())
+    }
+
+    if (!isAuthorized) {
       return res.status(403).json({ success: false, message: 'Not authorized' })
     }
     const safeName = (resume.name || 'Resume')
