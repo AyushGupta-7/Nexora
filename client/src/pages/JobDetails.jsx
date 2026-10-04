@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
+import ConfirmModal from '../components/common/ConfirmModal'
 import { useAuth } from '../context/AuthContext'
 import { getJob } from '../services/jobService'
 import { getResumes } from '../services/resumeService'
-import { applyForJob } from '../services/applicationService'
+import { applyForJob, withdrawApplication } from '../services/applicationService'
 import { formatDistanceToNow, format } from 'date-fns'
 import './JobDetails.css'
 
@@ -22,6 +23,8 @@ const JobDetails = () => {
   const [applying, setApplying] = useState(false)
   const [applied, setApplied] = useState(false)
   const [applyError, setApplyError] = useState('')
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false)
+  const [withdrawing, setWithdrawing] = useState(false)
 
   useEffect(() => {
     loadJob()
@@ -33,6 +36,9 @@ const JobDetails = () => {
       const response = await getJob(jobId)
       if (response.success) {
         setJob(response.job)
+        if (response.job.isApplied) {
+          setApplied(true)
+        }
       } else {
         setError('Job not found')
       }
@@ -72,6 +78,7 @@ const JobDetails = () => {
       const response = await applyForJob({ jobId, resumeId: selectedResumeId })
       if (response.success) {
         setApplied(true)
+        setJob(prev => ({ ...prev, isApplied: true, applicationId: response.application._id }))
         setShowApplyModal(false)
       } else {
         setApplyError(response.message || 'Application failed')
@@ -80,6 +87,25 @@ const JobDetails = () => {
       setApplyError(err.response?.data?.message || 'Application failed. Please try again.')
     } finally {
       setApplying(false)
+    }
+  }
+
+  const handleWithdraw = () => {
+    setShowWithdrawModal(true)
+  }
+
+  const confirmWithdraw = async () => {
+    if (!job.applicationId) return
+    setWithdrawing(true)
+    try {
+      await withdrawApplication(job.applicationId)
+      setApplied(false)
+      setJob(prev => ({ ...prev, isApplied: false }))
+      setShowWithdrawModal(false)
+    } catch (err) {
+      console.error('Withdraw error:', err)
+    } finally {
+      setWithdrawing(false)
     }
   }
 
@@ -280,10 +306,9 @@ const JobDetails = () => {
                 </div>
               )}
               {applied ? (
-                <div className="jd-applied-badge sidebar-applied">
-                  <span className="material-symbols-outlined">check_circle</span>
-                  Application Submitted
-                </div>
+                <button className="jd-btn jd-btn-secondary jd-sidebar-apply" onClick={handleWithdraw}>
+                  Withdraw
+                </button>
               ) : !job.applicationsOpen ? (
                 <div className="jd-closed-badge sidebar-closed">
                   <span className="material-symbols-outlined">lock</span>
@@ -400,6 +425,18 @@ const JobDetails = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={showWithdrawModal}
+        onClose={() => setShowWithdrawModal(false)}
+        onConfirm={confirmWithdraw}
+        title="Withdraw Application?"
+        message="Are you sure you want to withdraw your application?"
+        confirmText="Yes, Withdraw"
+        cancelText="No"
+        type="danger"
+        isLoading={withdrawing}
+      />
     </div>
   )
 }

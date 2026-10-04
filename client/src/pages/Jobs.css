@@ -193,12 +193,28 @@
 
 /* Job Card */
 .job-card {
+  position: relative;
   background: var(--color-surface-container);
   border: 1px solid var(--color-outline-variant);
   border-radius: 16px;
   padding: 20px;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.job-applied-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: color-mix(in srgb, #60a5fa 15%, transparent);
+  border: 1px solid color-mix(in srgb, #60a5fa 30%, transparent);
+  color: #60a5fa;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+  z-index: 2;
 }
 
 .job-card:hover {

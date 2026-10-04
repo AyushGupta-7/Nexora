@@ -21,7 +21,12 @@ const JobCard = ({ job, onClick }) => {
   }
 
   return (
-    <div className="job-card" onClick={() => onClick(job._id)}>
+    <div className={`job-card ${job.isApplied ? 'job-applied' : ''}`} onClick={() => onClick(job._id)}>
+      {job.isApplied && (
+        <div className="job-applied-badge">
+          APPLIED
+        </div>
+      )}
       <div className="job-card-header">
         <div className="job-company-logo">
           {avatar ? <img src={avatar} alt={job.company} /> : <span>{initials}</span>}

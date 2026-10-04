@@ -33,17 +33,27 @@ const applyForJob = async (req, res) => {
     }
 
     // Check for duplicate application
-    const existing = await Application.findOne({ user: req.user._id, job: jobId })
-    if (existing) {
-      return res.status(400).json({ success: false, message: 'You have already applied for this job' })
+    let application = await Application.findOne({ user: req.user._id, job: jobId })
+    
+    if (application) {
+      if (application.status !== 'Withdrawn') {
+        return res.status(400).json({ success: false, message: 'You have already applied for this job' })
+      }
+      
+      // Reapply by updating the existing withdrawn application
+      application.status = 'Applied'
+      application.stage = 'Applied'
+      application.resume = resumeId
+      application.coverNote = coverNote || ''
+      await application.save()
+    } else {
+      application = await Application.create({
+        user: req.user._id,
+        job: jobId,
+        resume: resumeId,
+        coverNote: coverNote || '',
+      })
     }
-
-    const application = await Application.create({
-      user: req.user._id,
-      job: jobId,
-      resume: resumeId,
-      coverNote: coverNote || '',
-    })
 
     const populated = await Application.findById(application._id)
       .populate('job', 'title company location type salary companyLogo applicationsOpen')

@@ -34,7 +34,24 @@ const getJobs = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(50)
 
-    res.status(200).json({ success: true, count: jobs.length, jobs })
+    let jobsWithAppliedState = jobs.map(j => j.toObject())
+
+    if (req.user) {
+      const applications = await Application.find({ 
+        user: req.user._id, 
+        job: { $in: jobs.map(j => j._id) },
+        status: { $ne: 'Withdrawn' }
+      })
+      
+      const appliedJobIds = new Set(applications.map(app => app.job.toString()))
+      
+      jobsWithAppliedState = jobsWithAppliedState.map(job => ({
+        ...job,
+        isApplied: appliedJobIds.has(job._id.toString())
+      }))
+    }
+
+    res.status(200).json({ success: true, count: jobs.length, jobs: jobsWithAppliedState })
   } catch (error) {
     console.error('Get jobs error:', error)
     res.status(500).json({ success: false, message: error.message || 'Server error' })
@@ -53,7 +70,24 @@ const getJob = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Job not found' })
     }
 
-    res.status(200).json({ success: true, job })
+    let jobWithAppliedState = job.toObject()
+
+    if (req.user) {
+      const application = await Application.findOne({
+        user: req.user._id,
+        job: job._id,
+        status: { $ne: 'Withdrawn' }
+      })
+      
+      if (application) {
+        jobWithAppliedState.isApplied = true
+        jobWithAppliedState.applicationId = application._id
+      } else {
+        jobWithAppliedState.isApplied = false
+      }
+    }
+
+    res.status(200).json({ success: true, job: jobWithAppliedState })
   } catch (error) {
     console.error('Get job error:', error)
     res.status(500).json({ success: false, message: error.message || 'Server error' })
@@ -239,7 +273,7 @@ const getJobApplicants = async (req, res) => {
     const applications = await Application.find({ job: req.params.id })
       .populate('user', 'fullName email avatar title')
       .populate('resume', 'name fileUrl')
-      .sort({ createdAt: -1 })
+      .sort({ updatedAt: -1 })
 
     res.status(200).json({ success: true, count: applications.length, applications, job })
   } catch (error) {
