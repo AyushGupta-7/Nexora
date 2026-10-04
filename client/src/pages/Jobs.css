@@ -205,7 +205,7 @@
 .job-applied-badge {
   position: absolute;
   top: 12px;
-  left: 12px;
+  right: 12px;
   background: color-mix(in srgb, #60a5fa 15%, transparent);
   border: 1px solid color-mix(in srgb, #60a5fa 30%, transparent);
   color: #60a5fa;

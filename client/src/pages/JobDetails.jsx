@@ -19,12 +19,16 @@ const JobDetails = () => {
   const [showApplyModal, setShowApplyModal] = useState(false)
   const [resumes, setResumes] = useState([])
   const [selectedResumeId, setSelectedResumeId] = useState('')
-  const [applyStep, setApplyStep] = useState('select') // 'select' | 'review'
+  const [applyStep, setApplyStep] = useState('select')
   const [applying, setApplying] = useState(false)
   const [applied, setApplied] = useState(false)
   const [applyError, setApplyError] = useState('')
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
+  const [viewingJd, setViewingJd] = useState(false)
+  const [downloadingJd, setDownloadingJd] = useState(false)
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
   useEffect(() => {
     loadJob()
@@ -106,6 +110,50 @@ const JobDetails = () => {
       console.error('Withdraw error:', err)
     } finally {
       setWithdrawing(false)
+    }
+  }
+
+  const fetchPdfBlob = async (action) => {
+    const token = localStorage.getItem('token')
+    const resp = await fetch(`${API_URL}/jobs/${jobId}/jd/${action}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      credentials: 'include',
+    })
+    if (!resp.ok) throw new Error(`Server returned ${resp.status}`)
+    const blob = await resp.blob()
+    return URL.createObjectURL(blob)
+  }
+
+  const handleViewJd = async () => {
+    if (viewingJd) return
+    setViewingJd(true)
+    try {
+      const blobUrl = await fetchPdfBlob('view')
+      window.open(blobUrl, '_blank', 'noopener,noreferrer')
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000)
+    } catch (err) {
+      console.error('View JD error:', err)
+    } finally {
+      setViewingJd(false)
+    }
+  }
+
+  const handleDownloadJd = async () => {
+    if (downloadingJd) return
+    setDownloadingJd(true)
+    try {
+      const blobUrl = await fetchPdfBlob('download')
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = `${job.title || 'JD'}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000)
+    } catch (err) {
+      console.error('Download JD error:', err)
+    } finally {
+      setDownloadingJd(false)
     }
   }
 
@@ -229,6 +277,35 @@ const JobDetails = () => {
               <h2 className="jd-section-title">Job Description</h2>
               <p className="jd-description">{job.description}</p>
             </div>
+
+            {/* JD PDF */}
+            {job.jdUrl && (
+              <div className="jd-section-card">
+                <h2 className="jd-section-title">Attached Document</h2>
+                <div className="jd-pdf-actions" style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                  <button 
+                    className="jd-btn jd-btn-secondary" 
+                    onClick={handleViewJd}
+                    disabled={viewingJd || downloadingJd}
+                  >
+                    <span className="material-symbols-outlined">
+                      {viewingJd ? 'hourglass_top' : 'visibility'}
+                    </span>
+                    {viewingJd ? 'Opening...' : 'View JD'}
+                  </button>
+                  <button 
+                    className="jd-btn jd-btn-secondary" 
+                    onClick={handleDownloadJd}
+                    disabled={viewingJd || downloadingJd}
+                  >
+                    <span className="material-symbols-outlined">
+                      {downloadingJd ? 'hourglass_top' : 'download'}
+                    </span>
+                    {downloadingJd ? 'Downloading...' : 'Download JD'}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Responsibilities */}
             {job.responsibilities && job.responsibilities.length > 0 && (

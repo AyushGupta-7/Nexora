@@ -52,6 +52,35 @@ const ApplicationCard = ({ application, onWithdraw }) => {
     }
   }
 
+  const [viewingResume, setViewingResume] = useState(false)
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
+  const fetchPdfBlob = async (resumeId, action) => {
+    const token = localStorage.getItem('token')
+    const resp = await fetch(`${API_URL}/resumes/${resumeId}/${action}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      credentials: 'include',
+    })
+    if (!resp.ok) throw new Error(`Server returned ${resp.status}`)
+    const blob = await resp.blob()
+    return URL.createObjectURL(blob)
+  }
+
+  const handleViewResume = async () => {
+    if (viewingResume) return
+    setViewingResume(true)
+    try {
+      const blobUrl = await fetchPdfBlob(resume._id, 'view')
+      window.open(blobUrl, '_blank', 'noopener,noreferrer')
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000)
+    } catch (err) {
+      console.error('View resume error:', err)
+      // gracefully fail
+    } finally {
+      setViewingResume(false)
+    }
+  }
+
   return (
     <>
     <div className="app-card">
@@ -106,11 +135,13 @@ const ApplicationCard = ({ application, onWithdraw }) => {
             {withdrawing ? 'Withdrawing...' : 'Withdraw'}
           </button>
         )}
-        {resume.fileUrl && (
-          <a href={resume.fileUrl} target="_blank" rel="noopener noreferrer" className="app-view-resume-btn">
-            <span className="material-symbols-outlined">open_in_new</span>
-            View Resume
-          </a>
+        {resume._id && (
+          <button onClick={handleViewResume} className="app-view-resume-btn" disabled={viewingResume}>
+            <span className="material-symbols-outlined">
+              {viewingResume ? 'hourglass_top' : 'open_in_new'}
+            </span>
+            {viewingResume ? 'Opening...' : 'View Resume'}
+          </button>
         )}
       </div>
     </div>
