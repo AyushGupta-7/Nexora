@@ -54,4 +54,15 @@ const protect = async (req, res, next) => {
   }
 }
 
-module.exports = { protect }
+// Recruiter-only middleware (must come after protect)
+const recruiterOnly = (req, res, next) => {
+  if (!req.user || req.user.role !== 'recruiter') {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied: recruiter account required',
+    })
+  }
+  next()
+}
+
+module.exports = { protect, recruiterOnly }

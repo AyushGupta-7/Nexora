@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
+import { useAuth } from '../context/AuthContext'
 import { getJob } from '../services/jobService'
 import { getResumes } from '../services/resumeService'
 import { applyForJob } from '../services/applicationService'
@@ -10,6 +11,7 @@ import './JobDetails.css'
 const JobDetails = () => {
   const { jobId } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [job, setJob] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -170,7 +172,12 @@ const JobDetails = () => {
                     <span className="material-symbols-outlined">check_circle</span>
                     Applied
                   </div>
-                ) : (
+                ) : !job.applicationsOpen ? (
+                  <div className="jd-closed-badge">
+                    <span className="material-symbols-outlined">lock</span>
+                    Applications Closed
+                  </div>
+                ) : user?.role === 'recruiter' ? null : (
                   <button className="jd-btn jd-btn-primary jd-apply-btn" onClick={handleOpenApply}>
                     <span className="material-symbols-outlined">send</span>
                     Apply Now
@@ -277,7 +284,12 @@ const JobDetails = () => {
                   <span className="material-symbols-outlined">check_circle</span>
                   Application Submitted
                 </div>
-              ) : (
+              ) : !job.applicationsOpen ? (
+                <div className="jd-closed-badge sidebar-closed">
+                  <span className="material-symbols-outlined">lock</span>
+                  Applications Closed
+                </div>
+              ) : user?.role === 'recruiter' ? null : (
                 <button className="jd-btn jd-btn-primary jd-sidebar-apply" onClick={handleOpenApply}>
                   Apply Now
                 </button>

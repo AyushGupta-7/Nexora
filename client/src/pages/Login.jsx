@@ -194,10 +194,17 @@ const Login = () => {
           />
 
           <div className="login-footer">
-            <p>
-              Don't have an account?{' '}
-              <Link to="/register" className="login-link">Apply to join</Link>
-            </p>
+            <div className="login-footer-links">
+              <div className="login-footer-col">
+                <p className="login-footer-label">Don't have an account?</p>
+                <Link to="/register" className="login-link">Apply to join</Link>
+              </div>
+              <div className="login-footer-divider" />
+              <div className="login-footer-col">
+                <p className="login-footer-label">Are you a recruiter?</p>
+                <Link to="/recruiter/register" className="login-link recruiter-link">Register as Recruiter</Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

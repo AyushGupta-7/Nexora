@@ -9,6 +9,15 @@ export const register = async (userData) => {
   }
 }
 
+export const recruiterRegister = async (userData) => {
+  try {
+    const response = await api.post('/auth/recruiter-register', userData)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 export const login = async (credentials) => {
   try {
     const response = await api.post('/auth/login', credentials)

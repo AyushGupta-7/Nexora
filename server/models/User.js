@@ -82,6 +82,17 @@ const userSchema = new mongoose.Schema({
   skills: [skillSchema],
   experiences: [experienceSchema],
   educations: [educationSchema],
+  role: {
+    type: String,
+    enum: ['user', 'recruiter'],
+    default: 'user',
+  },
+  companyName: {
+    type: String,
+    default: '',
+    trim: true,
+    maxlength: [100, 'Company name cannot exceed 100 characters'],
+  },
 }, {
   timestamps: true,
 })

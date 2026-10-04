@@ -4,22 +4,23 @@ const Resume = require('../models/Resume')
 
 // @desc    Apply for a job
 // @route   POST /api/applications
-// @access  Private
+// @access  Private (users only)
 const applyForJob = async (req, res) => {
   try {
     const { jobId, resumeId, coverNote } = req.body
 
     if (!jobId || !resumeId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Job and resume are required',
-      })
+      return res.status(400).json({ success: false, message: 'Job and resume are required' })
     }
 
-    // Verify job exists
+    // Verify job exists and is accepting applications
     const job = await Job.findById(jobId)
     if (!job || !job.isActive) {
       return res.status(404).json({ success: false, message: 'Job not found or no longer active' })
+    }
+
+    if (!job.applicationsOpen) {
+      return res.status(400).json({ success: false, message: 'Applications are closed for this job' })
     }
 
     // Verify resume belongs to user
@@ -45,7 +46,7 @@ const applyForJob = async (req, res) => {
     })
 
     const populated = await Application.findById(application._id)
-      .populate('job', 'title company location type')
+      .populate('job', 'title company location type salary companyLogo applicationsOpen')
       .populate('resume', 'name fileUrl')
 
     res.status(201).json({
@@ -68,7 +69,7 @@ const applyForJob = async (req, res) => {
 const getMyApplications = async (req, res) => {
   try {
     const applications = await Application.find({ user: req.user._id })
-      .populate('job', 'title company location type experience salary companyLogo')
+      .populate('job', 'title company location type experience salary companyLogo applicationsOpen isActive')
       .populate('resume', 'name fileUrl')
       .sort({ createdAt: -1 })
 
@@ -89,7 +90,7 @@ const getMyApplications = async (req, res) => {
 const getApplication = async (req, res) => {
   try {
     const application = await Application.findById(req.params.id)
-      .populate('job', 'title company location type experience salary description')
+      .populate('job', 'title company location type experience salary description applicationsOpen')
       .populate('resume', 'name fileUrl')
 
     if (!application) {
@@ -113,6 +114,7 @@ const getApplication = async (req, res) => {
 const withdrawApplication = async (req, res) => {
   try {
     const application = await Application.findById(req.params.id)
+      .populate('job', 'applicationsOpen')
 
     if (!application) {
       return res.status(404).json({ success: false, message: 'Application not found' })
@@ -126,7 +128,13 @@ const withdrawApplication = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Already withdrawn' })
     }
 
+    // Only allow withdrawal if job applications are still open
+    if (application.job && !application.job.applicationsOpen) {
+      return res.status(400).json({ success: false, message: 'Cannot withdraw after applications are closed' })
+    }
+
     application.status = 'Withdrawn'
+    application.stage = 'Withdrawn'
     await application.save()
 
     res.status(200).json({ success: true, message: 'Application withdrawn', application })

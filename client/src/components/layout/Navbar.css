@@ -324,3 +324,13 @@
 }
 
 .dropdown-item .material-symbols-outlined { font-size: 17px; }
+
+/* Recruiter-specific menu item */
+.dropdown-item.recruiter-menu-item {
+  color: #a78bfa;
+}
+
+.dropdown-item.recruiter-menu-item:hover {
+  background: rgba(167, 139, 250, 0.1);
+  color: #c4b5fd;
+}

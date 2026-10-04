@@ -58,9 +58,26 @@ const jobSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  duration: {
+    type: String,
+    default: '',
+    trim: true,
+  },
   isActive: {
     type: Boolean,
     default: true,
+  },
+  applicationsOpen: {
+    type: Boolean,
+    default: true,
+  },
+  jdUrl: {
+    type: String,
+    default: '',
+  },
+  jdPublicId: {
+    type: String,
+    default: '',
   },
 }, {
   timestamps: true,

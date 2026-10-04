@@ -12,6 +12,8 @@ import Messages from './pages/Messages'
 import Notifications from './pages/Notifications'
 import Resumes from './pages/Resumes'
 import Applications from './pages/Applications'
+import RecruiterRegister from './pages/RecruiterRegister'
+import RecruiterJobs from './pages/RecruiterJobs'
 import { useAuth } from './context/AuthContext'
 import './App.css'
 
@@ -46,6 +48,7 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path="/recruiter/register" element={<PublicRoute><RecruiterRegister /></PublicRoute>} />
 
         {/* Protected routes */}
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
@@ -59,6 +62,7 @@ function App() {
         <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
         <Route path="/resumes" element={<ProtectedRoute><Resumes /></ProtectedRoute>} />
         <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
+        <Route path="/recruiter/jobs" element={<ProtectedRoute><RecruiterJobs /></ProtectedRoute>} />
 
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />

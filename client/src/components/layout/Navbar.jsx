@@ -62,6 +62,11 @@ const Navbar = () => {
     navigate('/profile')
   }
 
+  const handleRecruiterJobs = () => {
+    setDropdownOpen(false)
+    navigate('/recruiter/jobs')
+  }
+
   const userAvatar = user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullName || 'User')}&background=00dce3&color=041329`
 
   return (
@@ -138,14 +143,24 @@ const Navbar = () => {
                 </div>
 
                 <div className="dropdown-divider"></div>
-                <Link to="/resumes" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
-                  <span className="material-symbols-outlined">description</span>
-                  My Resumes
-                </Link>
-                <Link to="/applications" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
-                  <span className="material-symbols-outlined">list_alt</span>
-                  Applications
-                </Link>
+                {user?.role !== 'recruiter' && (
+                  <>
+                    <Link to="/resumes" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                      <span className="material-symbols-outlined">description</span>
+                      My Resumes
+                    </Link>
+                    <Link to="/applications" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                      <span className="material-symbols-outlined">list_alt</span>
+                      Applications
+                    </Link>
+                  </>
+                )}
+                {user?.role === 'recruiter' && (
+                  <button className="dropdown-item recruiter-menu-item" onClick={handleRecruiterJobs}>
+                    <span className="material-symbols-outlined">business_center</span>
+                    Post a Job
+                  </button>
+                )}
                 <div className="dropdown-divider"></div>
                 <button onClick={handleLogout} className="dropdown-item logout-item">
                   <span className="material-symbols-outlined">logout</span>

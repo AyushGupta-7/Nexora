@@ -101,6 +101,23 @@ const resumeStorage = isCloudinaryConfigured()
       filename: (req, file, cb) => cb(null, `resume-${Date.now()}.pdf`),
     })
 
+// ── Job Description PDFs ──────────────────────────────────────────────────────
+const jdStorage = isCloudinaryConfigured()
+  ? new CloudinaryStorage({
+      cloudinary,
+      params: {
+        folder: 'nexora/jds',
+        resource_type: 'raw',
+        allowed_formats: ['pdf'],
+        use_filename: true,
+        unique_filename: true,
+      },
+    })
+  : multer.diskStorage({
+      destination: os.tmpdir(),
+      filename: (req, file, cb) => cb(null, `jd-${Date.now()}.pdf`),
+    })
+
 // ── Multer instances ──────────────────────────────────────────────────────────
 const upload = multer({
   storage: profileStorage,
@@ -132,8 +149,15 @@ const resumeUpload = multer({
   fileFilter: pdfFilter,
 })
 
+const jdUpload = multer({
+  storage: jdStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: pdfFilter,
+})
+
 module.exports = upload
 module.exports.coverUpload = coverUpload
 module.exports.postUpload = postUpload
 module.exports.messageUpload = messageUpload
 module.exports.resumeUpload = resumeUpload
+module.exports.jdUpload = jdUpload

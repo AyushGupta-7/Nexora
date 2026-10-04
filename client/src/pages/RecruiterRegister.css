@@ -1,0 +1,66 @@
+.recruiter-register-page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.recruiter-register-form {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Recruiter badge */
+.recruiter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 999px;
+  color: #a78bfa;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 12px;
+}
+
+.recruiter-badge .material-symbols-outlined {
+  font-size: 14px;
+}
+
+/* Recruiter glass panel */
+.recruiter-panel {
+  border-color: rgba(167, 139, 250, 0.2);
+}
+
+.recruiter-glass-icon {
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+.recruiter-glass-icon .material-symbols-outlined {
+  color: #a78bfa !important;
+}
+
+.recruiter-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.recruiter-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+}
+
+.recruiter-feature .material-symbols-outlined {
+  font-size: 18px;
+  color: #a78bfa;
+  flex-shrink: 0;
+}

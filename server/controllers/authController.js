@@ -9,7 +9,7 @@ const generateToken = (id) => {
   })
 }
 
-// @desc    Register user
+// @desc    Register normal user
 // @route   POST /api/auth/register
 // @access  Public
 const register = async (req, res) => {
@@ -18,7 +18,6 @@ const register = async (req, res) => {
 
     console.log('📝 Registration request:', { fullName, email })
 
-    // Validate required fields
     if (!fullName || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -26,7 +25,6 @@ const register = async (req, res) => {
       })
     }
 
-    // Check if user exists
     const userExists = await User.findOne({ email })
     if (userExists) {
       return res.status(400).json({
@@ -35,18 +33,16 @@ const register = async (req, res) => {
       })
     }
 
-    // Hash password manually
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
 
-    // Create user with hashed password
     const user = await User.create({
       fullName,
       email,
       password: hashedPassword,
+      role: 'user',
     })
 
-    // Generate token
     const token = generateToken(user._id)
 
     res.status(201).json({
@@ -57,36 +53,86 @@ const register = async (req, res) => {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
+        role: user.role,
       },
     })
   } catch (error) {
     console.error('❌ Register error:', error)
-    
-    // Handle mongoose validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message)
-      return res.status(400).json({
-        success: false,
-        message: messages.join(', '),
-      })
+      return res.status(400).json({ success: false, message: messages.join(', ') })
     }
-
-    // Handle duplicate key error
     if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already exists with this email',
-      })
+      return res.status(400).json({ success: false, message: 'User already exists with this email' })
     }
-
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Server error during registration',
-    })
+    res.status(500).json({ success: false, message: error.message || 'Server error during registration' })
   }
 }
 
-// @desc    Login user
+// @desc    Register recruiter account
+// @route   POST /api/auth/recruiter-register
+// @access  Public
+const recruiterRegister = async (req, res) => {
+  try {
+    const { fullName, email, password, companyName } = req.body
+
+    console.log('📝 Recruiter registration request:', { fullName, email, companyName })
+
+    if (!fullName || !email || !password || !companyName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide fullName, email, password, and companyName',
+      })
+    }
+
+    const userExists = await User.findOne({ email })
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        message: 'An account already exists with this email',
+      })
+    }
+
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+
+    const user = await User.create({
+      fullName,
+      email,
+      password: hashedPassword,
+      role: 'recruiter',
+      companyName: companyName.trim(),
+      title: `Recruiter at ${companyName.trim()}`,
+    })
+
+    const token = generateToken(user._id)
+
+    res.status(201).json({
+      success: true,
+      message: 'Recruiter account created successfully',
+      token,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        companyName: user.companyName,
+      },
+    })
+  } catch (error) {
+    console.error('❌ Recruiter register error:', error)
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message)
+      return res.status(400).json({ success: false, message: messages.join(', ') })
+    }
+    if (error.code === 11000) {
+      return res.status(400).json({ success: false, message: 'An account already exists with this email' })
+    }
+    res.status(500).json({ success: false, message: error.message || 'Server error during registration' })
+  }
+}
+
+// @desc    Login user (both roles)
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res) => {
@@ -95,7 +141,6 @@ const login = async (req, res) => {
 
     console.log('🔐 Login request:', { email })
 
-    // Validate required fields
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -103,25 +148,16 @@ const login = async (req, res) => {
       })
     }
 
-    // Check if user exists and include password
     const user = await User.findOne({ email }).select('+password')
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password',
-      })
+      return res.status(401).json({ success: false, message: 'Invalid email or password' })
     }
 
-    // Check password using bcrypt directly
     const isPasswordMatch = await bcrypt.compare(password, user.password)
     if (!isPasswordMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password',
-      })
+      return res.status(401).json({ success: false, message: 'Invalid email or password' })
     }
 
-    // Generate token
     const token = generateToken(user._id)
 
     res.status(200).json({
@@ -132,14 +168,13 @@ const login = async (req, res) => {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
+        role: user.role || 'user',
+        companyName: user.companyName || '',
       },
     })
   } catch (error) {
     console.error('❌ Login error:', error)
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Server error during login',
-    })
+    res.status(500).json({ success: false, message: error.message || 'Server error during login' })
   }
 }
 
@@ -151,10 +186,7 @@ const getMe = async (req, res) => {
     const user = await User.findById(req.user._id).select('-password')
     
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found',
-      })
+      return res.status(404).json({ success: false, message: 'User not found' })
     }
 
     res.status(200).json({
@@ -169,20 +201,20 @@ const getMe = async (req, res) => {
         location: user.location,
         about: user.about,
         coverImage: user.coverImage,
+        role: user.role || 'user',
+        companyName: user.companyName || '',
         createdAt: user.createdAt,
       },
     })
   } catch (error) {
     console.error('❌ Get me error:', error)
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Server error',
-    })
+    res.status(500).json({ success: false, message: error.message || 'Server error' })
   }
 }
 
 module.exports = {
   register,
+  recruiterRegister,
   login,
   getMe,
 }

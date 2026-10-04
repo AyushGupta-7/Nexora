@@ -11,6 +11,9 @@ const STATUS_STYLES = {
   'Under Review': { color: '#fbbf24', bg: 'rgba(251,191,36,0.12)', icon: 'visibility' },
   'Shortlisted': { color: '#a78bfa', bg: 'rgba(167,139,250,0.12)', icon: 'star' },
   'Interview': { color: '#34d399', bg: 'rgba(52,211,153,0.12)', icon: 'groups' },
+  'DSA Round': { color: '#f97316', bg: 'rgba(249,115,22,0.12)', icon: 'code' },
+  'Technical Interview': { color: '#06b6d4', bg: 'rgba(6,182,212,0.12)', icon: 'computer' },
+  'HR Interview': { color: '#ec4899', bg: 'rgba(236,72,153,0.12)', icon: 'record_voice_over' },
   'Selected': { color: '#4ade80', bg: 'rgba(74,222,128,0.15)', icon: 'check_circle' },
   'Rejected': { color: '#f87171', bg: 'rgba(248,113,113,0.12)', icon: 'cancel' },
   'Withdrawn': { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: 'undo' },
@@ -98,7 +101,7 @@ const ApplicationCard = ({ application, onWithdraw }) => {
 
       <div className="app-card-footer">
         <span className="app-date">Applied {formatDate(application.createdAt)}</span>
-        {status !== 'Withdrawn' && status !== 'Rejected' && status !== 'Selected' && (
+        {status !== 'Withdrawn' && status !== 'Rejected' && status !== 'Selected' && job.applicationsOpen !== false && (
           <button className="app-withdraw-btn" onClick={handleWithdraw} disabled={withdrawing}>
             {withdrawing ? 'Withdrawing...' : 'Withdraw'}
           </button>
