@@ -409,7 +409,7 @@
 /* Responsive */
 @media (max-width: 600px) {
   .network-main {
-    padding: 64px 12px 24px;
+    padding: 64px 12px 80px;
   }
 
   .network-tabs {

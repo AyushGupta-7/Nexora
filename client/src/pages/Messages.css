@@ -381,7 +381,7 @@
   .messages-sidebar {
     position: absolute;
     z-index: 10;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 130px); /* Account for top and bottom nav */
     left: 0;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
@@ -395,7 +395,7 @@
 
   .msg-row { max-width: 90%; }
 
-  .messages-main { margin-top: 60px; height: calc(100vh - 60px); }
+  .messages-main { margin-top: 60px; height: calc(100vh - 130px); }
 }
 
 /* ── Attach button ──────────────────────────────────────────────── */

@@ -439,7 +439,7 @@
 
 @media (max-width: 480px) {
   .jobs-main {
-    padding: 64px 12px 24px;
+    padding: 64px 12px 80px;
   }
 
   .jobs-search {

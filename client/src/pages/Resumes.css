@@ -379,7 +379,7 @@
 
 /* Responsive */
 @media (max-width: 600px) {
-  .resumes-main { padding: 64px 12px 24px; }
+  .resumes-main { padding: 64px 12px 80px; }
   .resumes-header { flex-direction: column; align-items: flex-start; }
   .resume-card { flex-wrap: wrap; }
 }

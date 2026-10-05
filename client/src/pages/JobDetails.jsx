@@ -282,7 +282,7 @@ const JobDetails = () => {
             {job.jdUrl && (
               <div className="jd-section-card">
                 <h2 className="jd-section-title">Attached Document</h2>
-                <div className="jd-pdf-actions" style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                <div className="jd-pdf-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px' }}>
                   <button 
                     className="jd-btn jd-btn-secondary" 
                     onClick={handleViewJd}

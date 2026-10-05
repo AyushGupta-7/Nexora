@@ -46,6 +46,12 @@
   }
 }
 
+@media (max-width: 767px) {
+  .profile-main {
+    padding-bottom: 80px;
+  }
+}
+
 .profile-grid {
   display: flex;
   flex-direction: column;

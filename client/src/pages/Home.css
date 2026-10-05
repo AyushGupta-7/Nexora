@@ -2,7 +2,13 @@
   min-height: 100vh;
   background: var(--color-background);
   padding-top: 80px;
-  padding-bottom: 48px;
+  padding-bottom: 80px;
+}
+
+@media (min-width: 1024px) {
+  .home-page {
+    padding-bottom: 48px;
+  }
 }
 
 .home-main {

@@ -395,7 +395,7 @@
 /* Responsive */
 @media (max-width: 600px) {
   .vp-main {
-    padding: 64px 12px 24px;
+    padding: 64px 12px 80px;
   }
 
   .vp-header-content {

@@ -191,6 +191,6 @@
 
 /* Responsive */
 @media (max-width: 600px) {
-  .notif-main { padding: 64px 12px 24px; }
+  .notif-main { padding: 64px 12px 80px; }
   .notification-item { padding: 14px 14px; }
 }
